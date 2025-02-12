@@ -1,0 +1,58 @@
+.button {  
+-fx-border-color: transparent;
+-fx-background-color: transparent;
+-fx-background-radius: 0;
+-fx-background-insets: 0;
+}
+.button .text {
+-fx-fill: black;
+ }
+
+.button:hover, .button:pressed {
+ -fx-background-color: grey;    
+ }
+  
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.scroll-bar:vertical{
+    -fx-background-color:transparent;
+}
+
+.increment-button, .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: grey;
+}
+
+.scroll-bar:vertical .track{
+    -fx-background-color: transparent;
+    -fx-border-color: grey;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: grey;
+    -fx-background-radius: 0;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
+
+.hboxTask {
+	-fx-background-color: transparent;
+}
+ 
+.hboxTask:hover {
+ 	-fx-background-color: transparent;  
+ }
+
+.hboxTask:pressed {
+ 	-fx-background-color: grey;  
+ }
+ 
+ .labelStrikethrough .text {
+	-fx-strikethrough: true;
+}
