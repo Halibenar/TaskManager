@@ -68,7 +68,7 @@ public class TaskPane extends VBox {
 		this.deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		this.deleteButton.setText("D");
 		this.deleteButton.setMinSize(34, 33);
-		this.deleteButton.setOnAction(_ -> {
+		this.deleteButton.setOnAction(e -> {
 			this.delete();
 		});
 		this.deleteButton.setVisible(false);

@@ -72,7 +72,7 @@ public class MainTaskPane extends TaskPane {
 		this.getChildren().add(taskButton);
 		
 		//Button toggles expanded property and visibility of subtasks, if there are any
-		taskButton.setOnAction(_ -> {
+		taskButton.setOnAction(e -> {
 			if (!this.editMode && ((MainTask)this.task).getSubTaskList().size() > 0) {
 				((MainTask)this.task).setExpanded(!((MainTask)this.task).isExpanded());
 			}
@@ -82,7 +82,7 @@ public class MainTaskPane extends TaskPane {
 		this.editButton.setText("E");
 		this.editButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		this.editButton.setMinSize(34, 33);
-		this.editButton.setOnAction(_ -> {
+		this.editButton.setOnAction(e -> {
 			((MainTask)this.task).setExpanded(true);
 			((MainTask)this.task).setEditMode(true);
 		});
@@ -91,7 +91,7 @@ public class MainTaskPane extends TaskPane {
 		Button addButton = new Button("+");
 		addButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 		addButton.setMinSize(34, 33);
-		addButton.setOnAction(_ -> {
+		addButton.setOnAction(e -> {
 			SubTask newTask = new SubTask((MainTask)this.task);
 			((MainTask)this.task).addToSubTaskList(newTask);
 			newTask.taskPane.setEditMode(true);
@@ -101,7 +101,7 @@ public class MainTaskPane extends TaskPane {
 		Button confirmButton = new Button("C");
 		confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		confirmButton.setMinSize(34, 33);
-		confirmButton.setOnAction(_ -> {
+		confirmButton.setOnAction(e -> {
 			((MainTask)this.task).setEditMode(false);
 			
 			//Set task variables
@@ -109,7 +109,7 @@ public class MainTaskPane extends TaskPane {
 			LocalTime time = null;
 			try {
 				time = LocalTime.parse(this.taskTimeField.getText(), DateTimeFormatter.ofPattern("HHmm"));
-			} catch (Exception e) {
+			} catch (Exception ex) {
 				
 			} finally {
 				((MainTask)this.task).setTime(time);
@@ -144,7 +144,7 @@ public class MainTaskPane extends TaskPane {
 		previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 		previousDateButton.setMinSize(34, 33);
 		previousDateButton.setAlignment(Pos.BASELINE_CENTER);
-		previousDateButton.setOnAction(_ -> {
+		previousDateButton.setOnAction(e -> {
 			this.setNewPlanDate(this.taskDate.minusDays(1));
 		});
 
@@ -153,7 +153,7 @@ public class MainTaskPane extends TaskPane {
 		nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		nextDateButton.setMinSize(34, 33);
 		nextDateButton.setAlignment(Pos.BASELINE_CENTER);
-		nextDateButton.setOnAction(_ -> {
+		nextDateButton.setOnAction(e -> {
 			this.setNewPlanDate(this.taskDate.plusDays(1));
 		});
 

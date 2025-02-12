@@ -65,7 +65,7 @@ public class CalendarPane extends VBox {
 		this.dateButton.setMaxWidth(Double.MAX_VALUE);
 		HBox.setHgrow(this.dateButton, Priority.ALWAYS);
 		this.dateButton.setAlignment(Pos.BASELINE_CENTER);
-		this.dateButton.setOnAction(_ -> {
+		this.dateButton.setOnAction(e -> {
 			datePicker.pickerDate = planDate.date;
 			datePicker.Update();
 			datePicker.setVisible(!datePicker.isVisible());
@@ -88,7 +88,7 @@ public class CalendarPane extends VBox {
 		todayButton.setFont(titleFont);
 		todayButton.setMinSize(titleButtonSize[0], titleButtonSize[1]);
 		todayButton.setAlignment(Pos.BASELINE_CENTER);
-		todayButton.setOnAction(_ -> {
+		todayButton.setOnAction(e -> {
 			planDate = new PlanDate(LocalDate.now());
 			this.update(this.currentViewMode);
 		});
@@ -155,11 +155,11 @@ public class CalendarPane extends VBox {
 		this.dateButton.setText(titleString);
 
 		//Set next and previous date buttons to skip specified number of days
-		this.nextDateButton.setOnAction(_ -> {
+		this.nextDateButton.setOnAction(e -> {
 			planDate = new PlanDate(planDate.date.plusDays(daysShown));
 			this.update(this.currentViewMode);
 		});
-		this.previousDateButton.setOnAction(_ -> {
+		this.previousDateButton.setOnAction(e -> {
 			planDate = new PlanDate(planDate.date.minusDays(daysShown));
 			this.update(this.currentViewMode);
 		});
@@ -200,7 +200,7 @@ public class CalendarPane extends VBox {
 			//Create transparent border so taskpane is visible behind DatePicker, when clicked on transparent borders the DatePicker disappears
 			this.setStyle("-fx-background-color: transparent;");
 			this.setAlignment(Pos.TOP_CENTER);
-			this.setOnMouseClicked(_ -> { this.setVisible(false); });
+			this.setOnMouseClicked(e -> { this.setVisible(false); });
 
 			//Create inner pane to hold date buttons
 			VBox innerPane = new VBox();
@@ -226,7 +226,7 @@ public class CalendarPane extends VBox {
 			previousDayButton.setMinSize(31, 31);
 			previousDayButton.setMaxSize(31, 31);
 			previousDayButton.setAlignment(Pos.BASELINE_CENTER);
-			previousDayButton.setOnAction(_ -> {
+			previousDayButton.setOnAction(e -> {
 				this.pickerDate = this.pickerDate.minusMonths(1);
 				this.Update();
 			});
@@ -236,7 +236,7 @@ public class CalendarPane extends VBox {
 			todayButton.setMinSize(31, 31);
 			todayButton.setMaxSize(31, 31);
 			todayButton.setAlignment(Pos.BASELINE_CENTER);
-			todayButton.setOnAction(_ -> {
+			todayButton.setOnAction(e -> {
 				this.pickerDate = LocalDate.now();
 				this.setVisible(false);
 				planDate = new PlanDate(this.pickerDate);
@@ -248,7 +248,7 @@ public class CalendarPane extends VBox {
 			nextDayButton.setMinSize(31, 31);
 			nextDayButton.setMaxSize(31, 31);
 			nextDayButton.setAlignment(Pos.BASELINE_CENTER);
-			nextDayButton.setOnAction(_ -> {
+			nextDayButton.setOnAction(e -> {
 				this.pickerDate = this.pickerDate.plusMonths(1);
 				this.Update();
 			});
@@ -310,7 +310,7 @@ public class CalendarPane extends VBox {
 				}
 
 				//Hide DatePicker and display TaskPane for date when button is clicked
-				dateButton.setOnAction(_ -> {
+				dateButton.setOnAction(e -> {
 					this.pickerDate = followingDate;
 					this.setVisible(false);
 					planDate = new PlanDate(this.pickerDate);
@@ -325,7 +325,7 @@ public class CalendarPane extends VBox {
 					weekButton.setMaxSize(64, 31);
 					weekButton.setAlignment(Pos.CENTER_LEFT);
 					//Hide DatePicker and display TaskPane for week when button is clicked
-					weekButton.setOnAction(_ -> {
+					weekButton.setOnAction(e -> {
 						this.pickerDate = followingDate;
 						this.setVisible(false);
 						planDate = new PlanDate(this.pickerDate);

@@ -124,7 +124,7 @@ public class Main extends Application {
 			this.setDateTime();
 			
 			//Check time and date every 0.5 seconds and change date and time label text to match
-			Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), _ -> {
+			Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> {
 				this.setDateTime();
 			}));
 			timeline.setCycleCount(Animation.INDEFINITE);

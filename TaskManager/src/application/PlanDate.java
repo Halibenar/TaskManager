@@ -116,7 +116,7 @@ public class PlanDate {
 		Button addTaskButton = new Button("+");
 		addTaskButton.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 		addTaskButton.setMinSize(35, 35);
-		addTaskButton.setOnAction(_ -> {
+		addTaskButton.setOnAction(e -> {
 			MainTask newTask = new MainTask(this);
 			this.taskBox.getChildren().add(newTask.taskPane);
 			((MainTaskPane)newTask.taskPane).setExpanded(true);
