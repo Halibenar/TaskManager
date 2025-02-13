@@ -6,6 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -66,11 +68,16 @@ public class TaskPane extends VBox {
 		
 		//Delete button deletes subtask or task
 		this.deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		this.deleteButton.setText("D");
 		this.deleteButton.setMinSize(34, 33);
+		this.deleteButton.setMaxSize(34, 33);
 		this.deleteButton.setOnAction(e -> {
 			this.delete();
 		});
+		Image cancelImage = new Image(getClass().getResourceAsStream("ButtonCancel.png"));
+		ImageView cancelImageView = new ImageView(cancelImage);
+		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
+		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
+		this.deleteButton.setGraphic(cancelImageView);
 		this.deleteButton.setVisible(false);
 		this.deleteButton.setManaged(false);
 		
