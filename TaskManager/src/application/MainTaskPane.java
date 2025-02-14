@@ -9,6 +9,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -98,9 +100,15 @@ public class MainTaskPane extends TaskPane {
 		});
 		
 		//Confirm button
-		Button confirmButton = new Button("C");
-		confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
+		Button confirmButton = new Button();
 		confirmButton.setMinSize(34, 33);
+		confirmButton.setMaxSize(34, 33);
+		Image confirmImage = new Image(getClass().getResourceAsStream("ButtonConfirm.png"));
+		ImageView confirmImageView = new ImageView(confirmImage);
+		confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
+		confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
+		confirmButton.setGraphic(confirmImageView);
+		confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		confirmButton.setOnAction(e -> {
 			((MainTask)this.task).setEditMode(false);
 			
