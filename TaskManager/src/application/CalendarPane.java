@@ -11,6 +11,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -53,18 +55,13 @@ public class CalendarPane extends VBox {
 		//Add elements
 		this.getChildren().addAll(dateBar, dateStack);
 
-		//Title button size
-		int[] titleButtonSize = {25, 25};
-		int fontSize = 17;
-
 		//Central date button, sets datePicker as visible in dateStack
 		this.dateButton = new Button();
-		Font titleFont = new Font(dateButton.getFont().getName(), fontSize);
+		Font titleFont = new Font(dateButton.getFont().getName(), 15);
 		this.dateButton.setFont(titleFont);
-		this.dateButton.setPrefHeight(titleButtonSize[0]);
+		this.dateButton.setMaxHeight(33);
 		this.dateButton.setMaxWidth(Double.MAX_VALUE);
 		HBox.setHgrow(this.dateButton, Priority.ALWAYS);
-		this.dateButton.setAlignment(Pos.BASELINE_CENTER);
 		this.dateButton.setOnAction(e -> {
 			datePicker.pickerDate = planDate.date;
 			datePicker.Update();
@@ -72,22 +69,34 @@ public class CalendarPane extends VBox {
 		});
 
 		//Previous date button
-		this.previousDateButton = new Button("<");
-		this.previousDateButton.setFont(titleFont);
-		this.previousDateButton.setMinSize(titleButtonSize[0], titleButtonSize[1]);
-		this.previousDateButton.setAlignment(Pos.BASELINE_CENTER);
+		this.previousDateButton = new Button();
+		this.previousDateButton.setMinSize(34, 33);
+		this.previousDateButton.setMaxSize(34, 33);
+		Image previousImage = new Image(getClass().getResourceAsStream("ButtonPrevious.png"));
+		ImageView previousImageView = new ImageView(previousImage);
+		previousImageView.fitHeightProperty().bind(this.previousDateButton.heightProperty());
+		previousImageView.fitWidthProperty().bind(this.previousDateButton.widthProperty());
+		this.previousDateButton.setGraphic(previousImageView);
 
 		//Next date button
-		this.nextDateButton = new Button(">");
-		this.nextDateButton.setFont(titleFont);
-		this.nextDateButton.setMinSize(titleButtonSize[0], titleButtonSize[1]);
-		this.nextDateButton.setAlignment(Pos.BASELINE_CENTER);
+		this.nextDateButton = new Button();
+		this.nextDateButton.setMinSize(34, 33);
+		this.nextDateButton.setMaxSize(34, 33);
+		Image nextImage = new Image(getClass().getResourceAsStream("ButtonNext.png"));
+		ImageView nextImageView = new ImageView(nextImage);
+		nextImageView.fitHeightProperty().bind(this.nextDateButton.heightProperty());
+		nextImageView.fitWidthProperty().bind(this.nextDateButton.widthProperty());
+		this.nextDateButton.setGraphic(nextImageView);
 
 		//Today button
-		Button todayButton = new Button("^");
-		todayButton.setFont(titleFont);
-		todayButton.setMinSize(titleButtonSize[0], titleButtonSize[1]);
-		todayButton.setAlignment(Pos.BASELINE_CENTER);
+		Button todayButton = new Button();
+		todayButton.setMinSize(34, 33);
+		todayButton.setMaxSize(34, 33);
+		Image todayImage = new Image(getClass().getResourceAsStream("ButtonToday.png"));
+		ImageView todayImageView = new ImageView(todayImage);
+		todayImageView.fitHeightProperty().bind(todayButton.heightProperty());
+		todayImageView.fitWidthProperty().bind(todayButton.widthProperty());
+		todayButton.setGraphic(todayImageView);
 		todayButton.setOnAction(e -> {
 			planDate = new PlanDate(LocalDate.now());
 			this.update(this.currentViewMode);
