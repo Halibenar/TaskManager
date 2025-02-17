@@ -92,7 +92,13 @@ public class MainTaskPane extends TaskPane {
 		//Add button adds new subtask
 		Button addButton = new Button("+");
 		addButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
+		addButton.setMaxSize(34, 33);
 		addButton.setMinSize(34, 33);
+		Image addImage = new Image(getClass().getResourceAsStream("ButtonPlus.png"));
+		ImageView addImageView = new ImageView(addImage);
+		addImageView.fitHeightProperty().bind(addButton.heightProperty());
+		addImageView.fitWidthProperty().bind(addButton.widthProperty());
+		addButton.setGraphic(addImageView);
 		addButton.setOnAction(e -> {
 			SubTask newTask = new SubTask((MainTask)this.task);
 			((MainTask)this.task).addToSubTaskList(newTask);
