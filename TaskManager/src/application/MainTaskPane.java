@@ -106,15 +106,15 @@ public class MainTaskPane extends TaskPane {
 		});
 		
 		//Confirm button
-		Button confirmButton = new Button("C");
-		confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		confirmButton.setMaxSize(34, 33);
+		Button confirmButton = new Button();
 		confirmButton.setMinSize(34, 33);
+		confirmButton.setMaxSize(34, 33);
 		Image confirmImage = new Image(getClass().getResourceAsStream("ButtonConfirm.png"));
 		ImageView confirmImageView = new ImageView(confirmImage);
 		confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
 		confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
 		confirmButton.setGraphic(confirmImageView);
+		confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		confirmButton.setOnAction(e -> {
 			((MainTask)this.task).setEditMode(false);
 			
