@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -113,14 +115,21 @@ public class PlanDate {
 		this.taskBox.setPadding(new Insets(0, 0, 3, 0));
 
 		//Add task button
-		Button addTaskButton = new Button("+");
+		Button addTaskButton = new Button();
 		addTaskButton.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 		addTaskButton.setMinSize(35, 35);
+		addTaskButton.setMaxSize(35, 35);
+		Image addImage = new Image(getClass().getResourceAsStream("ButtonEdit.png"));
+		ImageView addImageView = new ImageView(addImage);
+		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
+		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
+		addTaskButton.setGraphic(addImageView);
 		addTaskButton.setOnAction(e -> {
 			MainTask newTask = new MainTask(this);
 			this.taskBox.getChildren().add(newTask.taskPane);
-			((MainTaskPane)newTask.taskPane).setExpanded(true);
-			newTask.taskPane.setEditMode(true);
+			newTask.setExpanded(true);
+			newTask.setEditMode(true);
+			newTask.updateSQL();
 		});
 		dayBox.getChildren().addAll(dayOfWeekLabel, this.taskBox, addTaskButton);
 

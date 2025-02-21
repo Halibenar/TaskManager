@@ -34,7 +34,7 @@ public class TaskPane extends VBox {
 	public TaskPane(Task task) {
 		this.task = task;
 		this.setPadding(new Insets(4,0,4,9));	
-		this.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 0 0;");
+		this.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 0 1;");
 		HBox.setHgrow(this, Priority.ALWAYS);
 		this.setMaxWidth(Double.MAX_VALUE);
 

@@ -43,6 +43,7 @@ public class MainTaskPane extends TaskPane {
 		this.setPadding(new Insets(0,0,0,0));
 		this.getChildren().clear();
 		this.getChildren().addAll(this.buttonBox, this.mainTaskBox, this.subTaskBox);
+		this.subTaskBox.setPadding(new Insets(0,0,0,34));
 		
 		//Time label
 		this.taskTimeLabel.setAlignment(Pos.CENTER_LEFT);
@@ -81,19 +82,31 @@ public class MainTaskPane extends TaskPane {
 		});
 
 		//Edit button toggles edit mode for main and subtasks
-		this.editButton.setText("E");
 		this.editButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		this.editButton.setMinSize(34, 33);
+		this.editButton.setMaxSize(34, 33);
+		Image editImage = new Image(getClass().getResourceAsStream("ButtonEdit.png"));
+		ImageView editImageView = new ImageView(editImage);
+		editImageView.fitHeightProperty().bind(this.editButton.heightProperty());
+		editImageView.fitWidthProperty().bind(this.editButton.widthProperty());
+		this.editButton.setGraphic(editImageView);
 		this.editButton.setOnAction(e -> {
 			((MainTask)this.task).setExpanded(true);
 			((MainTask)this.task).setEditMode(true);
 		});
 		
+		//Delete button graphic is different from subtasks
+		Image cancelImage = new Image(getClass().getResourceAsStream("ButtonDelete.png"));
+		ImageView cancelImageView = new ImageView(cancelImage);
+		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
+		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
+		this.deleteButton.setGraphic(cancelImageView);
+		
 		//Add button adds new subtask
-		Button addButton = new Button("+");
+		Button addButton = new Button();
 		addButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
-		addButton.setMaxSize(34, 33);
 		addButton.setMinSize(34, 33);
+		addButton.setMaxSize(34, 33);
 		Image addImage = new Image(getClass().getResourceAsStream("ButtonPlus.png"));
 		ImageView addImageView = new ImageView(addImage);
 		addImageView.fitHeightProperty().bind(addButton.heightProperty());
@@ -154,19 +167,29 @@ public class MainTaskPane extends TaskPane {
 		this.setNewPlanDate(((MainTask)this.task).getPlanDate().date);
 		
 		//Previous date button
-		Button previousDateButton = new Button("<");
+		Button previousDateButton = new Button();
 		previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 		previousDateButton.setMinSize(34, 33);
-		previousDateButton.setAlignment(Pos.BASELINE_CENTER);
+		previousDateButton.setMaxSize(34, 33);
+		Image previousImage = new Image(getClass().getResourceAsStream("ButtonPrevious.png"));
+		ImageView previousImageView = new ImageView(previousImage);
+		previousImageView.fitHeightProperty().bind(previousDateButton.heightProperty());
+		previousImageView.fitWidthProperty().bind(previousDateButton.widthProperty());
+		previousDateButton.setGraphic(previousImageView);
 		previousDateButton.setOnAction(e -> {
 			this.setNewPlanDate(this.taskDate.minusDays(1));
 		});
 
 		//Next date button
-		Button nextDateButton = new Button(">");
+		Button nextDateButton = new Button();
 		nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		nextDateButton.setMinSize(34, 33);
-		nextDateButton.setAlignment(Pos.BASELINE_CENTER);
+		nextDateButton.setMaxSize(34, 33);
+		Image nextImage = new Image(getClass().getResourceAsStream("ButtonNext.png"));
+		ImageView nextImageView = new ImageView(nextImage);
+		nextImageView.fitHeightProperty().bind(nextDateButton.heightProperty());
+		nextImageView.fitWidthProperty().bind(nextDateButton.widthProperty());
+		nextDateButton.setGraphic(nextImageView);
 		nextDateButton.setOnAction(e -> {
 			this.setNewPlanDate(this.taskDate.plusDays(1));
 		});
