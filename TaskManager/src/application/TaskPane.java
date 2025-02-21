@@ -73,7 +73,7 @@ public class TaskPane extends VBox {
 		this.deleteButton.setOnAction(e -> {
 			this.delete();
 		});
-		Image cancelImage = new Image(getClass().getResourceAsStream("ButtonCancel.png"));
+		Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"));
 		ImageView cancelImageView = new ImageView(cancelImage);
 		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
 		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
@@ -102,13 +102,15 @@ public class TaskPane extends VBox {
 		if (completed) {
 			this.taskNameLabel.getStyleClass().clear();
 			this.taskNameLabel.getStyleClass().add("labelStrikethrough");
-			this.completeCheckBox.setSelected(true);
 		} else {
 			this.taskNameLabel.getStyleClass().clear();
-			this.completeCheckBox.setSelected(false);
+		}
+		
+		//rebuild subtasklist to change order
+		if (this.task instanceof SubTask) {
+			((MainTaskPane)((SubTask)this.task).getMainTask().taskPane).addSubTaskPanes();
 		}
 	}
-	
 	
 	/**
 	 * Sets TaskPane as invisible and deletes Task from SQLite database.

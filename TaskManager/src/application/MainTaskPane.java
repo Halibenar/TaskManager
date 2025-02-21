@@ -85,7 +85,7 @@ public class MainTaskPane extends TaskPane {
 		this.editButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		this.editButton.setMinSize(34, 33);
 		this.editButton.setMaxSize(34, 33);
-		Image editImage = new Image(getClass().getResourceAsStream("ButtonEdit.png"));
+		Image editImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"));
 		ImageView editImageView = new ImageView(editImage);
 		editImageView.fitHeightProperty().bind(this.editButton.heightProperty());
 		editImageView.fitWidthProperty().bind(this.editButton.widthProperty());
@@ -96,7 +96,7 @@ public class MainTaskPane extends TaskPane {
 		});
 		
 		//Delete button graphic is different from subtasks
-		Image cancelImage = new Image(getClass().getResourceAsStream("ButtonDelete.png"));
+		Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"));
 		ImageView cancelImageView = new ImageView(cancelImage);
 		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
 		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
@@ -107,7 +107,7 @@ public class MainTaskPane extends TaskPane {
 		addButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 		addButton.setMinSize(34, 33);
 		addButton.setMaxSize(34, 33);
-		Image addImage = new Image(getClass().getResourceAsStream("ButtonPlus.png"));
+		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonPlus.png"));
 		ImageView addImageView = new ImageView(addImage);
 		addImageView.fitHeightProperty().bind(addButton.heightProperty());
 		addImageView.fitWidthProperty().bind(addButton.widthProperty());
@@ -122,7 +122,7 @@ public class MainTaskPane extends TaskPane {
 		Button confirmButton = new Button();
 		confirmButton.setMinSize(34, 33);
 		confirmButton.setMaxSize(34, 33);
-		Image confirmImage = new Image(getClass().getResourceAsStream("ButtonConfirm.png"));
+		Image confirmImage = new Image(getClass().getResourceAsStream("/icons/ButtonConfirm.png"));
 		ImageView confirmImageView = new ImageView(confirmImage);
 		confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
 		confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
@@ -155,7 +155,13 @@ public class MainTaskPane extends TaskPane {
 				((MainTask)this.task).setExpanded(true);
 			}
 			
-			//Updte UI
+			//Update subtask display
+			this.addSubTaskPanes();
+			
+			//Rebuild maintasklist to change order
+			((MainTask)this.task).getPlanDate().updateTaskBox();
+			
+			//Update UI
 			Main.calendarPane.update(Main.calendarPane.currentViewMode);
 		});
 		
@@ -171,7 +177,7 @@ public class MainTaskPane extends TaskPane {
 		previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 		previousDateButton.setMinSize(34, 33);
 		previousDateButton.setMaxSize(34, 33);
-		Image previousImage = new Image(getClass().getResourceAsStream("ButtonPrevious.png"));
+		Image previousImage = new Image(getClass().getResourceAsStream("/icons/ButtonPrevious.png"));
 		ImageView previousImageView = new ImageView(previousImage);
 		previousImageView.fitHeightProperty().bind(previousDateButton.heightProperty());
 		previousImageView.fitWidthProperty().bind(previousDateButton.widthProperty());
@@ -185,7 +191,7 @@ public class MainTaskPane extends TaskPane {
 		nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		nextDateButton.setMinSize(34, 33);
 		nextDateButton.setMaxSize(34, 33);
-		Image nextImage = new Image(getClass().getResourceAsStream("ButtonNext.png"));
+		Image nextImage = new Image(getClass().getResourceAsStream("/icons/ButtonNext.png"));
 		ImageView nextImageView = new ImageView(nextImage);
 		nextImageView.fitHeightProperty().bind(nextDateButton.heightProperty());
 		nextImageView.fitWidthProperty().bind(nextDateButton.widthProperty());
@@ -238,12 +244,17 @@ public class MainTaskPane extends TaskPane {
 		} else {
 			this.taskTimeLabel.getStyleClass().clear();
 		}
+		
+		//rebuild maintasklist to change order
+		((MainTask)this.task).getPlanDate().updateTaskBox();
+		
 	}
 	
 	/**
 	 * Adds the TaskPanes of SubTasks belonging to the MainTask to the MainTaskPane.
 	 */
-	public void addSubTaskPanes() {
+	public void addSubTaskPanes() {		
+		//Clear box
 		this.subTaskBox.getChildren().clear();
 		
 		//Add subtaskpanes, set editmode

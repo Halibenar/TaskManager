@@ -141,6 +141,7 @@ public class PlanDate {
 	 */
 	public void updateTaskBox() {
 		this.taskBox.getChildren().clear();
+		this.taskList.sort(null);
 		for (MainTask task : this.taskList) {
 			this.taskBox.getChildren().add(task.taskPane);
 		}
