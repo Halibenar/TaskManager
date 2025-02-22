@@ -119,7 +119,7 @@ public class PlanDate {
 		addTaskButton.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 		addTaskButton.setMinSize(35, 35);
 		addTaskButton.setMaxSize(35, 35);
-		Image addImage = new Image(getClass().getResourceAsStream("ButtonEdit.png"));
+		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"));
 		ImageView addImageView = new ImageView(addImage);
 		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
 		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());

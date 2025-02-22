@@ -1,5 +1,6 @@
 package application;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -59,7 +60,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public void updateSQL() {
 		
 		//Get data to insert
-		String[] data = new String[6];
+		String[] data = new String[7];
 		data[0] = this.getName();
 		data[1] = this.getPlanDate().toString();
 		data[2] = null;
@@ -67,12 +68,16 @@ public class MainTask extends Task implements Comparable<MainTask> {
 			data[2] = this.getTime().toString().substring(0,5);
 		}
 		data[3] = this.isCompleted().toString();
-		data[4] = this.isExpanded().toString();
-		data[5] = this.isEditMode().toString();
+		data[4] = Boolean.FALSE.toString();
+		if (this.getPlanDate().date.isAfter(LocalDate.now())) {
+			data[4] = Boolean.TRUE.toString();
+		}
+		data[5] = this.isExpanded().toString();
+		data[6] = this.isEditMode().toString();
 
 		//If new task, add to database
 		if (this.getID() == 0) {
-			String insertString = "INSERT INTO tasks (Name, Date, Time, Completed, Expanded, Editmode) VALUES (?,?,?,?,?,?)";
+			String insertString = "INSERT INTO tasks (Name, Date, Time, Completed, Overdue, Expanded, Editmode) VALUES (?,?,?,?,?,?,?)";
 			this.setID(SQLConnector.insert(insertString, data));
 
 		//If already exists, update records

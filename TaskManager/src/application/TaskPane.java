@@ -73,7 +73,7 @@ public class TaskPane extends VBox {
 		this.deleteButton.setOnAction(e -> {
 			this.delete();
 		});
-		Image cancelImage = new Image(getClass().getResourceAsStream("ButtonCancel.png"));
+		Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"));
 		ImageView cancelImageView = new ImageView(cancelImage);
 		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
 		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());

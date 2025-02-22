@@ -57,6 +57,7 @@ public class Main extends Application {
 				  "	Date DATE NOT NULL," +
 				  "	Time TEXT," +
 				  "	Completed INTYINT(1) NOT NULL," +
+				  "	Overdue INTYINT(1) NOT NULL," +
 				  "	Expanded INTYINT(1) NOT NULL," +
 				  "	Editmode INTYINT(1) NOT NULL" +
 				  ");");

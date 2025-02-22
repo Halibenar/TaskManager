@@ -72,7 +72,7 @@ public class CalendarPane extends VBox {
 		this.previousDateButton = new Button();
 		this.previousDateButton.setMinSize(34, 33);
 		this.previousDateButton.setMaxSize(34, 33);
-		Image previousImage = new Image(getClass().getResourceAsStream("ButtonPrevious.png"));
+		Image previousImage = new Image(getClass().getResourceAsStream("/icons/ButtonPrevious.png"));
 		ImageView previousImageView = new ImageView(previousImage);
 		previousImageView.fitHeightProperty().bind(this.previousDateButton.heightProperty());
 		previousImageView.fitWidthProperty().bind(this.previousDateButton.widthProperty());
@@ -82,7 +82,7 @@ public class CalendarPane extends VBox {
 		this.nextDateButton = new Button();
 		this.nextDateButton.setMinSize(34, 33);
 		this.nextDateButton.setMaxSize(34, 33);
-		Image nextImage = new Image(getClass().getResourceAsStream("ButtonNext.png"));
+		Image nextImage = new Image(getClass().getResourceAsStream("/icons/ButtonNext.png"));
 		ImageView nextImageView = new ImageView(nextImage);
 		nextImageView.fitHeightProperty().bind(this.nextDateButton.heightProperty());
 		nextImageView.fitWidthProperty().bind(this.nextDateButton.widthProperty());
@@ -92,7 +92,7 @@ public class CalendarPane extends VBox {
 		Button todayButton = new Button();
 		todayButton.setMinSize(34, 33);
 		todayButton.setMaxSize(34, 33);
-		Image todayImage = new Image(getClass().getResourceAsStream("ButtonToday.png"));
+		Image todayImage = new Image(getClass().getResourceAsStream("/icons/ButtonToday.png"));
 		ImageView todayImageView = new ImageView(todayImage);
 		todayImageView.fitHeightProperty().bind(todayButton.heightProperty());
 		todayImageView.fitWidthProperty().bind(todayButton.widthProperty());
