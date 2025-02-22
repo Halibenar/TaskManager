@@ -130,6 +130,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	}
 	
 	public ArrayList<SubTask> getSubTaskList() {
+		this.subTaskList.sort(null);
 		return this.subTaskList;
 	}
 
@@ -147,20 +148,31 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		this.subTaskList.remove(subTask);
 		((MainTaskPane)this.taskPane).addSubTaskPanes();
 	}
-	
+
 	@Override
 	public int compareTo(MainTask another) {
 		int outcome = 0;
 
-		if (this.time == null && another.time != null)
-		{
+		//Sort based on task completion first
+		if (this.isCompleted() && !another.isCompleted()) {
 			outcome = 1;
-		} else if (this.time != null && another.time == null) {
+		} else if (!this.isCompleted() && another.isCompleted()) {
 			outcome = -1;
-		} else if (this.time != null && another.time != null) {
-			outcome = this.time.compareTo(another.time);
 		}
 
+		//Sort based on time second
+		if (outcome == 0) {
+			if (this.time == null && another.time != null)
+			{
+				outcome = 1;
+			} else if (this.time != null && another.time == null) {
+				outcome = -1;
+			} else if (this.time != null && another.time != null) {
+				outcome = this.time.compareTo(another.time);
+			}
+		}
+
+		//Sort based on name last
 		if (outcome == 0) {
 			outcome = this.name.compareTo(another.name);
 		}
