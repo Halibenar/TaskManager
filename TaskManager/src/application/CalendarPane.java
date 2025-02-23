@@ -1,12 +1,15 @@
 package application;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import application.Main.ViewMode;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -172,6 +175,72 @@ public class CalendarPane extends VBox {
 			planDate = new PlanDate(planDate.date.minusDays(daysShown));
 			this.update(this.currentViewMode);
 		});
+
+		//List of overdue tasks
+		ArrayList<MainTask> overdueTaskList = new ArrayList<MainTask>();
+
+		//Get tasks from database
+		SQLConnector.read("SELECT * FROM tasks WHERE Date < '" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "' AND Completed = 'false'", rs -> {
+			try {
+				while (rs.next()) {
+					//Parse string result from time query to LocalTime if it's not null
+					LocalTime taskTime = null;
+					if (rs.getString("Time") != null) {
+						taskTime = LocalTime.parse(rs.getString("Time"));
+					}
+
+					//Create new main task
+					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), new PlanDate(LocalDate.parse(rs.getString("Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"))), taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")), Boolean.parseBoolean(rs.getString("Editmode")));
+					
+					//Get subtasks for main task
+					SQLConnector.read("SELECT * FROM subtasks WHERE MainTaskID = " + newMainTask.getID(), rsSubTask -> {
+						try {
+							while (rsSubTask.next()) {
+								//Create subtask
+								SubTask newSubTask = new SubTask(newMainTask, rsSubTask.getInt("ID"), rsSubTask.getString("Name"), Boolean.parseBoolean(rsSubTask.getString("Completed")));
+								//Add to subtasklist
+								newMainTask.addToSubTaskList(newSubTask);
+							}
+						} catch (SQLException e) {
+							System.out.println(e);
+						}
+					});
+
+					//Add main task to tasklist
+					overdueTaskList.add(newMainTask);
+				}
+			} catch (SQLException e) {
+				System.out.println(e);
+			}
+		});
+
+		//Box in grid for overdue tasks
+		VBox overdueBox = new VBox();
+		overdueBox.setPadding(new Insets(0, 3, 3, 3));
+		overdueBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
+		
+		overdueBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		GridPane.setHgrow(overdueBox, Priority.ALWAYS);
+
+		//Overdue label
+		Label overdueLabel = new Label("OVERDUE");
+		overdueLabel.setFont(new Font(overdueLabel.getFont().getName(), 12));
+
+		//Labels for tasks with spacing of 3 between tasks and between following add task button
+		VBox taskBox = new VBox();
+		taskBox.setSpacing(3);
+		taskBox.setPadding(new Insets(0, 0, 3, 0));
+		
+		//Add taskPanes of overdue tasks
+		for (MainTask task : overdueTaskList) {
+			taskBox.getChildren().add(task.taskPane);
+		}
+
+		//Add overdue box if there are overdue tasks
+		overdueBox.getChildren().addAll(overdueLabel, taskBox);
+		if (overdueTaskList.size() > 0) {
+			this.daysGridPane.add(overdueBox, 0, 0);
+		}
 		
 		//Box in grid for each day
 		for (int i = 0; i < daysShown; i++) {
@@ -179,14 +248,14 @@ public class CalendarPane extends VBox {
 			showDate.getTasks();
 			VBox dayBox = showDate.createDayBox();
 			showDate.updateTaskBox();
-			this.daysGridPane.add(dayBox, i % rowLength, i / rowLength);
+			this.daysGridPane.add(dayBox, i+1 % rowLength, i+1 / rowLength);
 		}
 
-		if (daysShown == 7) {
-			VBox weekBox = new VBox();
-			weekBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
-			this.daysGridPane.add(weekBox, 7 % rowLength, 7 / rowLength);
-		}
+//		if (daysShown == 7) {
+//			VBox weekBox = new VBox();
+//			weekBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
+//			this.daysGridPane.add(weekBox, 7 % rowLength, 7 / rowLength);
+//		}
 	}
 
 	/**
