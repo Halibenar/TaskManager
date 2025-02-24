@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -32,19 +31,24 @@ public class CalendarPane extends VBox {
 
 	PlanDate planDate = new PlanDate(LocalDate.now());
 	ArrayList<PlanDate> retrievedDates = new ArrayList<PlanDate>();
-	GridPane daysGridPane;
-	Button dateButton;
+	VBox daysBox;
+	Button datePickerButton;
 	Button previousDateButton;
 	Button nextDateButton;
+	Button weekButton;
+	Button[] dayButtons;
 	ViewMode currentViewMode;
 
 	public CalendarPane() {
-		//Task display layer
-		//Date panel
 		//HBox for buttons and viewdate
 		HBox dateBar = new HBox();
 		dateBar.setAlignment(Pos.CENTER_LEFT);
 		dateBar.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
+		
+		//HBox for day selection buttons
+		HBox dayButtonBar = new HBox();
+		dayButtonBar.setAlignment(Pos.CENTER_LEFT);
+		dayButtonBar.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
 		
 		//Stackpane
 		StackPane dateStack = new StackPane();
@@ -56,16 +60,25 @@ public class CalendarPane extends VBox {
 		datePicker.setVisible(false);
 
 		//Add elements
-		this.getChildren().addAll(dateBar, dateStack);
+		this.getChildren().addAll(dateBar, dayButtonBar, dateStack);
 
-		//Central date button, sets datePicker as visible in dateStack
-		this.dateButton = new Button();
-		Font titleFont = new Font(dateButton.getFont().getName(), 15);
-		this.dateButton.setFont(titleFont);
-		this.dateButton.setMaxHeight(33);
-		this.dateButton.setMaxWidth(Double.MAX_VALUE);
-		HBox.setHgrow(this.dateButton, Priority.ALWAYS);
-		this.dateButton.setOnAction(e -> {
+		//Central date button, sets viewmode to week
+		this.weekButton = new Button();
+		Font titleFont = new Font(weekButton.getFont().getName(), 15);
+		this.weekButton.setFont(titleFont);
+		this.weekButton.setMaxHeight(33);
+		this.weekButton.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(this.weekButton, Priority.ALWAYS);
+		this.weekButton.setOnAction(e -> {
+			this.planDate = new PlanDate(planDate.date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+			this.update(ViewMode.week);
+		});
+		
+		//Datepicker button, sets datePicker as visible in dateStack
+		this.datePickerButton = new Button("D");
+		this.datePickerButton.setMinSize(34, 33);
+		this.datePickerButton.setMaxSize(34, 33);
+		this.datePickerButton.setOnAction(e -> {
 			datePicker.pickerDate = planDate.date;
 			datePicker.Update();
 			datePicker.setVisible(!datePicker.isVisible());
@@ -106,24 +119,37 @@ public class CalendarPane extends VBox {
 		});
 
 		//Add to dateBar
-		dateBar.getChildren().addAll(this.previousDateButton, todayButton, this.dateButton, this.nextDateButton);
+		dateBar.getChildren().addAll(this.previousDateButton, todayButton, this.weekButton, this.datePickerButton, this.nextDateButton);
 		dateBar.getStyleClass().add("hbox");
+		
+		//Buttons for day selection
+		this.dayButtons = new Button[7];
+		for (int i = 0; i < 7; i++) {
+			this.dayButtons[i] = new Button();
+			if (i < 6) {
+				this.dayButtons[i].setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
+			}
+			this.dayButtons[i].setPadding(new Insets(0,0,0,0));
+			this.dayButtons[i].setMinSize(34, 33);
+			this.dayButtons[i].setMaxSize(Double.MAX_VALUE, 33);
+			HBox.setHgrow(this.dayButtons[i], Priority.ALWAYS);
+			dayButtonBar.getChildren().add(this.dayButtons[i]);
+		}
 
-		//GridPane with Panes for a day, week or month
-		this.daysGridPane = new GridPane();
+		//VBox with tasks for each day
+		this.daysBox = new VBox(1);
 
-		//Enclose GridPane in ScrollPane
-		ScrollPane scrollPane = new ScrollPane(daysGridPane);
+		//Enclose VBox in ScrollPane
+		ScrollPane scrollPane = new ScrollPane(daysBox);
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
 
-		//scrollPane.setFitToHeight(true);
 		scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 		scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 		dateStack.getChildren().addAll(scrollPane, datePicker);
 
 		//Update display elements
-		this.update(ViewMode.day);
+		this.update(ViewMode.week);
 	}
 
 	/**
@@ -135,46 +161,46 @@ public class CalendarPane extends VBox {
 		this.currentViewMode = viewMode;
 
 		final int daysShown;
-		int rowLength;
 		String titleString;
 		LocalDate startDate;
 		
 		//Get display info, title and starting date
 		if (this.currentViewMode == ViewMode.day) {
 			daysShown = 1;
-			rowLength = 1;
-			startDate = planDate.date;
-			titleString = startDate.getDayOfWeek().toString() + " " + startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+//			startDate = planDate.date;
+//			titleString = startDate.getDayOfWeek().toString() + " " + startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 		} else { //viewMode is week
 			daysShown = 7;
-			rowLength = 2;
-			startDate = planDate.date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-			titleString = "WEEK " + startDate.get(WeekFields.of(DayOfWeek.MONDAY, 4).weekOfWeekBasedYear()) + ", " + startDate.getMonth().toString() + " " + startDate.format(DateTimeFormatter.ofPattern("yyyy"));
 		}
-
-		//Clear
-		this.daysGridPane.getChildren().clear();
-		this.daysGridPane.getColumnConstraints().clear();
 		
-		//Set column constraints
-		ColumnConstraints cc = new ColumnConstraints();
-		cc.setPercentWidth(100d / rowLength);
-		for (int i = 0; i < rowLength; i++) {
-			this.daysGridPane.getColumnConstraints().add(cc);
-		}
+		startDate = planDate.date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+		titleString = "WEEK " + startDate.get(WeekFields.of(DayOfWeek.MONDAY, 4).weekOfWeekBasedYear()) + ", " + startDate.getMonth().toString() + " " + startDate.format(DateTimeFormatter.ofPattern("yyyy"));
+	
+		//Clear
+		this.daysBox.getChildren().clear();
 
 		//Set date button to display date
-		this.dateButton.setText(titleString);
+		this.weekButton.setText(titleString);
 
 		//Set next and previous date buttons to skip specified number of days
 		this.nextDateButton.setOnAction(e -> {
-			planDate = new PlanDate(planDate.date.plusDays(daysShown));
-			this.update(this.currentViewMode);
+			planDate = new PlanDate(planDate.date.plusDays(7));
+			this.update(ViewMode.week);
 		});
 		this.previousDateButton.setOnAction(e -> {
-			planDate = new PlanDate(planDate.date.minusDays(daysShown));
-			this.update(this.currentViewMode);
+			planDate = new PlanDate(planDate.date.minusDays(7));
+			this.update(ViewMode.week);
 		});
+
+		//Set daybuttons to days
+		for (int i = 0; i < 7; i++) {
+			LocalDate buttonDate = startDate.plusDays(i);
+			this.dayButtons[i].setText(buttonDate.getDayOfWeek().toString().substring(0,3) + " " + buttonDate.format(DateTimeFormatter.ofPattern("dd")));
+			this.dayButtons[i].setOnAction(e -> {
+				planDate = new PlanDate(buttonDate);
+				this.update(ViewMode.day);
+			});
+		}
 
 		//List of overdue tasks
 		ArrayList<MainTask> overdueTaskList = new ArrayList<MainTask>();
@@ -213,43 +239,63 @@ public class CalendarPane extends VBox {
 				System.out.println(e);
 			}
 		});
-
-		//Box in grid for overdue tasks
-		VBox overdueBox = new VBox();
-		overdueBox.setPadding(new Insets(0, 3, 3, 3));
-		overdueBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
 		
-		overdueBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		GridPane.setHgrow(overdueBox, Priority.ALWAYS);
-
-		//Overdue label
-		Label overdueLabel = new Label("OVERDUE");
-		overdueLabel.setFont(new Font(overdueLabel.getFont().getName(), 12));
-
-		//Labels for tasks with spacing of 3 between tasks and between following add task button
-		VBox taskBox = new VBox();
-		taskBox.setSpacing(3);
-		taskBox.setPadding(new Insets(0, 0, 3, 0));
-		
-		//Add taskPanes of overdue tasks
-		for (MainTask task : overdueTaskList) {
-			taskBox.getChildren().add(task.taskPane);
-		}
-
-		//Add overdue box if there are overdue tasks
-		overdueBox.getChildren().addAll(overdueLabel, taskBox);
 		if (overdueTaskList.size() > 0) {
-			this.daysGridPane.add(overdueBox, 0, 0);
+			//Box in grid for overdue tasks
+			VBox overdueBox = new VBox();
+			overdueBox.setPadding(new Insets(0, 3, 3, 3));
+			overdueBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
+
+			overdueBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+			GridPane.setHgrow(overdueBox, Priority.ALWAYS);
+
+			//Overdue label
+			Label overdueLabel = new Label("OVERDUE");
+			overdueLabel.setFont(new Font(overdueLabel.getFont().getName(), 12));
+
+			//Labels for tasks with spacing of 3 between tasks and between following add task button
+			VBox taskBox = new VBox();
+			taskBox.setSpacing(3);
+			taskBox.setPadding(new Insets(0, 0, 3, 0));
+
+			//Add taskPanes of overdue tasks
+			for (MainTask task : overdueTaskList) {
+				taskBox.getChildren().add(task.taskPane);
+			}
+
+			//Add overdue box if there are overdue tasks
+			overdueBox.getChildren().addAll(overdueLabel, taskBox);
+			this.daysBox.getChildren().add(overdueBox);
 		}
 		
-		//Box in grid for each day
-		for (int i = 0; i < daysShown; i++) {
-			PlanDate showDate = new PlanDate(startDate.plusDays(i));
+		//Box in VBox for each day
+		for (int i1 = 0; i1 < daysShown; i1++) {
+			PlanDate showDate = new PlanDate(this.planDate.date.plusDays(i1));
 			showDate.getTasks();
 			VBox dayBox = showDate.createDayBox();
 			showDate.updateTaskBox();
-			this.daysGridPane.add(dayBox, i+1 % rowLength, i+1 / rowLength);
+			this.daysBox.getChildren().add(dayBox);
 		}
+		
+		//Add task button
+		Button addTaskButton = new Button();
+		addTaskButton.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+		addTaskButton.setMinSize(35, 35);
+		addTaskButton.setMaxSize(35, 35);
+		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"));
+		ImageView addImageView = new ImageView(addImage);
+		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
+		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
+		addTaskButton.setGraphic(addImageView);
+		addTaskButton.setOnAction(e -> {
+			MainTask newTask = new MainTask(this.planDate);
+			this.planDate.taskBox.getChildren().add(newTask.taskPane);
+			newTask.setExpanded(true);
+			newTask.setEditMode(true);
+			newTask.updateSQL();
+			this.update(currentViewMode);
+		});
+		this.daysBox.getChildren().add(addTaskButton);
 
 //		if (daysShown == 7) {
 //			VBox weekBox = new VBox();
