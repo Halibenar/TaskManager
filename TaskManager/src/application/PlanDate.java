@@ -114,24 +114,7 @@ public class PlanDate {
 		this.taskBox.setSpacing(3);
 		this.taskBox.setPadding(new Insets(0, 0, 3, 0));
 
-		//Add task button
-		Button addTaskButton = new Button();
-		addTaskButton.setStyle("-fx-border-color: black; -fx-border-width: 1;");
-		addTaskButton.setMinSize(35, 35);
-		addTaskButton.setMaxSize(35, 35);
-		Image addImage = new Image(getClass().getResourceAsStream("ButtonEdit.png"));
-		ImageView addImageView = new ImageView(addImage);
-		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
-		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
-		addTaskButton.setGraphic(addImageView);
-		addTaskButton.setOnAction(e -> {
-			MainTask newTask = new MainTask(this);
-			this.taskBox.getChildren().add(newTask.taskPane);
-			newTask.setExpanded(true);
-			newTask.setEditMode(true);
-			newTask.updateSQL();
-		});
-		dayBox.getChildren().addAll(dayOfWeekLabel, this.taskBox, addTaskButton);
+		dayBox.getChildren().addAll(dayOfWeekLabel, this.taskBox);
 
 		return dayBox;
 	}
