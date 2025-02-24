@@ -68,7 +68,21 @@ public class SubTask extends Task implements Comparable<SubTask> {
 	
 	@Override
 	public int compareTo(SubTask another) {
-		return this.name.compareTo(another.name);
+		int outcome = 0;
+
+		//Sort based on task completion first
+		if (this.isCompleted() && !another.isCompleted()) {
+			outcome = 1;
+		} else if (!this.isCompleted() && another.isCompleted()) {
+			outcome = -1;
+		}
+		
+		//Sort based on name last
+		if (outcome == 0) {
+			outcome = this.name.compareTo(another.name);
+		}
+
+		return outcome;
 	}
 	
 	public MainTask getMainTask() {

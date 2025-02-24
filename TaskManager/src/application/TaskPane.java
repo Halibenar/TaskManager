@@ -102,13 +102,15 @@ public class TaskPane extends VBox {
 		if (completed) {
 			this.taskNameLabel.getStyleClass().clear();
 			this.taskNameLabel.getStyleClass().add("labelStrikethrough");
-			this.completeCheckBox.setSelected(true);
 		} else {
 			this.taskNameLabel.getStyleClass().clear();
-			this.completeCheckBox.setSelected(false);
+		}
+		
+		//rebuild subtasklist to change order
+		if (this.task instanceof SubTask) {
+			((MainTaskPane)((SubTask)this.task).getMainTask().taskPane).addSubTaskPanes();
 		}
 	}
-	
 	
 	/**
 	 * Sets TaskPane as invisible and deletes Task from SQLite database.

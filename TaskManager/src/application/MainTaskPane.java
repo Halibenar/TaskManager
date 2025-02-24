@@ -155,7 +155,13 @@ public class MainTaskPane extends TaskPane {
 				((MainTask)this.task).setExpanded(true);
 			}
 			
-			//Updte UI
+			//Update subtask display
+			this.addSubTaskPanes();
+			
+			//Rebuild maintasklist to change order
+			((MainTask)this.task).getPlanDate().updateTaskBox();
+			
+			//Update UI
 			Main.calendarPane.update(Main.calendarPane.currentViewMode);
 		});
 		
@@ -238,12 +244,17 @@ public class MainTaskPane extends TaskPane {
 		} else {
 			this.taskTimeLabel.getStyleClass().clear();
 		}
+		
+		//rebuild maintasklist to change order
+		((MainTask)this.task).getPlanDate().updateTaskBox();
+		
 	}
 	
 	/**
 	 * Adds the TaskPanes of SubTasks belonging to the MainTask to the MainTaskPane.
 	 */
-	public void addSubTaskPanes() {
+	public void addSubTaskPanes() {		
+		//Clear box
 		this.subTaskBox.getChildren().clear();
 		
 		//Add subtaskpanes, set editmode
