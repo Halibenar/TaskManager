@@ -66,7 +66,7 @@ public class PlanDate {
 					}
 
 					//Create new main task
-					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), this, taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")), Boolean.parseBoolean(rs.getString("Editmode")));
+					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), this, taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")));
 
 					//Get subtasks for main task
 					SQLConnector.read("SELECT * FROM subtasks WHERE MainTaskID = " + newMainTask.getID(), rsSubTask -> {

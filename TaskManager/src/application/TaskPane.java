@@ -2,12 +2,8 @@ package application;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -19,13 +15,10 @@ import javafx.scene.layout.VBox;
 public class TaskPane extends VBox {
 
 	protected Task task;
-	protected Boolean editMode = false;
 
 	protected HBox taskBox = new HBox();
 	protected Label taskNameLabel = new Label();
-	protected TextField taskNameField = new TextField();
 	protected CheckBox completeCheckBox = new CheckBox();
-	protected Button deleteButton = new Button();
 
 	/**
 	 * Creates TaskPane to display information on a SubTask.
@@ -51,37 +44,13 @@ public class TaskPane extends VBox {
 		HBox.setHgrow(this.taskNameLabel, Priority.ALWAYS);
 		this.taskNameLabel.setMaxWidth(Double.MAX_VALUE);
 
-		//Name field
-		this.taskNameField.setAlignment(Pos.CENTER_LEFT);
-		HBox.setHgrow(this.taskNameField, Priority.ALWAYS);
-		this.taskNameField.setMaxWidth(Double.MAX_VALUE);
-
-		//Disable fields by default
-		this.taskNameField.setVisible(false);
-		this.taskNameField.setManaged(false);
-
 		//Complete checkbox
 		this.completeCheckBox.setOnAction(e -> {
 			task.setCompleted(!task.isCompleted());
 			e.consume();
 		});
 		
-		//Delete button deletes subtask or task
-		this.deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		this.deleteButton.setMinSize(34, 33);
-		this.deleteButton.setMaxSize(34, 33);
-		this.deleteButton.setOnAction(e -> {
-			this.delete();
-		});
-		Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"));
-		ImageView cancelImageView = new ImageView(cancelImage);
-		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
-		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
-		this.deleteButton.setGraphic(cancelImageView);
-		this.deleteButton.setVisible(false);
-		this.deleteButton.setManaged(false);
-		
-		this.taskBox.getChildren().addAll(this.completeCheckBox, this.taskNameLabel, this.taskNameField, this.deleteButton);
+		this.taskBox.getChildren().addAll(this.completeCheckBox, this.taskNameLabel);
 		
 		//Set name, completed
 		this.setName(task.getName());
@@ -92,7 +61,6 @@ public class TaskPane extends VBox {
 	
 	public void setName(String name) {
 		this.taskNameLabel.setText(name);
-		this.taskNameField.setText(name);
 	}
 	
 	public void setCompleted(Boolean completed) {
@@ -125,21 +93,5 @@ public class TaskPane extends VBox {
 		}
 		//Update UI
 		Main.calendarPane.update(Main.calendarPane.currentViewMode);
-	}
-
-	/**
-	 * Sets TaskPane editMode. Hides labels and shows fields to enable editing of name.
-	 * @param editMode
-	 */
-	public void setEditMode(Boolean editMode) {
-		this.editMode = editMode;
-
-		//Set visibility
-		this.taskNameLabel.setVisible(!editMode);
-		this.taskNameLabel.setManaged(!editMode);
-		this.taskNameField.setVisible(editMode);
-		this.taskNameField.setManaged(editMode);
-		this.deleteButton.setVisible(editMode);
-		this.deleteButton.setManaged(editMode);
 	}
 }

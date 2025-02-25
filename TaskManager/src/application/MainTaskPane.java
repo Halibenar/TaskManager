@@ -1,6 +1,5 @@
 package application;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javafx.geometry.Insets;
@@ -8,7 +7,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -22,15 +20,11 @@ import javafx.scene.text.Text;
  */
 public class MainTaskPane extends TaskPane {
 	
-	private LocalDate taskDate;	
-	
 	private HBox mainTaskBox = new HBox();
 	private VBox subTaskBox = new VBox();
 	private HBox buttonBox = new HBox();
 	private Label taskTimeLabel = new Label();
-	private TextField taskTimeField = new TimeTextField();
 	private Button editButton = new Button();
-	private Label dateLabel = new Label();
 
 	/**
 	 * Creates MainTaskPane to display information on a MainTask.
@@ -51,18 +45,9 @@ public class MainTaskPane extends TaskPane {
 		this.taskTimeLabel.setMinWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
 		this.taskTimeLabel.setMaxWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
 
-		//Time field
-		this.taskTimeField.setAlignment(Pos.CENTER_LEFT);
-		this.taskTimeField.setMinWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
-		this.taskTimeField.setMaxWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
-
-		//Disable fields by default
-		this.taskTimeField.setVisible(false);
-		this.taskTimeField.setManaged(false);
-
 		//Rebuild Hbox
 		this.taskBox.getChildren().clear();
-		this.taskBox.getChildren().addAll(this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel, this.taskTimeField, this.taskNameField);
+		this.taskBox.getChildren().addAll(this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel);
 
 		//Button to hold the HBox
 		Button taskButton = new Button();
@@ -76,11 +61,11 @@ public class MainTaskPane extends TaskPane {
 		
 		//Button toggles expanded property and visibility of subtasks, if there are any
 		taskButton.setOnAction(e -> {
-			if (!this.editMode && ((MainTask)this.task).getSubTaskList().size() > 0) {
+			if (((MainTask)this.task).getSubTaskList().size() > 0) {
 				((MainTask)this.task).setExpanded(!((MainTask)this.task).isExpanded());
 			}
 		});
-
+		
 		//Edit button toggles edit mode for main and subtasks
 		this.editButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		this.editButton.setMinSize(34, 33);
@@ -91,129 +76,15 @@ public class MainTaskPane extends TaskPane {
 		editImageView.fitWidthProperty().bind(this.editButton.widthProperty());
 		this.editButton.setGraphic(editImageView);
 		this.editButton.setOnAction(e -> {
-			((MainTask)this.task).setExpanded(true);
-			((MainTask)this.task).setEditMode(true);
-		});
-		
-		//Delete button graphic is different from subtasks
-		Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"));
-		ImageView cancelImageView = new ImageView(cancelImage);
-		cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
-		cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
-		this.deleteButton.setGraphic(cancelImageView);
-		
-		//Add button adds new subtask
-		Button addButton = new Button();
-		addButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
-		addButton.setMinSize(34, 33);
-		addButton.setMaxSize(34, 33);
-		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonPlus.png"));
-		ImageView addImageView = new ImageView(addImage);
-		addImageView.fitHeightProperty().bind(addButton.heightProperty());
-		addImageView.fitWidthProperty().bind(addButton.widthProperty());
-		addButton.setGraphic(addImageView);
-		addButton.setOnAction(e -> {
-			SubTask newTask = new SubTask((MainTask)this.task);
-			((MainTask)this.task).addToSubTaskList(newTask);
-			newTask.taskPane.setEditMode(true);
-		});
-		
-		//Confirm button
-		Button confirmButton = new Button();
-		confirmButton.setMinSize(34, 33);
-		confirmButton.setMaxSize(34, 33);
-		Image confirmImage = new Image(getClass().getResourceAsStream("/icons/ButtonConfirm.png"));
-		ImageView confirmImageView = new ImageView(confirmImage);
-		confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
-		confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
-		confirmButton.setGraphic(confirmImageView);
-		confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		confirmButton.setOnAction(e -> {
-			((MainTask)this.task).setEditMode(false);
-			
-			//Set task variables
-			this.task.setName(this.taskNameField.getText());
-			LocalTime time = null;
-			try {
-				time = LocalTime.parse(this.taskTimeField.getText(), DateTimeFormatter.ofPattern("HHmm"));
-			} catch (Exception ex) {
-				
-			} finally {
-				((MainTask)this.task).setTime(time);
-			}
-			
-			//Move task
-			((MainTask)this.task).setPlanDate(new PlanDate(taskDate));
-			
-			//Set subtask variables
-			for(SubTask subTask : ((MainTask)this.task).getSubTaskList()) {
-				subTask.setName(subTask.taskPane.taskNameField.getText());
-			}
-			
-			//Expand task if there are any subtasks
-			if (((MainTask)this.task).getSubTaskList().size() > 0) {
-				((MainTask)this.task).setExpanded(true);
-			}
-			
-			//Update subtask display
-			this.addSubTaskPanes();
-			
-			//Rebuild maintasklist to change order
-			((MainTask)this.task).getPlanDate().updateTaskBox();
-			
-			//Update UI
-			Main.calendarPane.update(Main.calendarPane.currentViewMode);
-		});
-		
-		//Date label
-		this.dateLabel.setAlignment(Pos.BASELINE_CENTER);
-		this.dateLabel.setMaxWidth(Double.MAX_VALUE);
-		HBox.setHgrow(dateLabel, Priority.ALWAYS);
-		this.dateLabel.setAlignment(Pos.BASELINE_CENTER);
-		this.setNewPlanDate(((MainTask)this.task).getPlanDate().date);
-		
-		//Previous date button
-		Button previousDateButton = new Button();
-		previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
-		previousDateButton.setMinSize(34, 33);
-		previousDateButton.setMaxSize(34, 33);
-		Image previousImage = new Image(getClass().getResourceAsStream("/icons/ButtonPrevious.png"));
-		ImageView previousImageView = new ImageView(previousImage);
-		previousImageView.fitHeightProperty().bind(previousDateButton.heightProperty());
-		previousImageView.fitWidthProperty().bind(previousDateButton.widthProperty());
-		previousDateButton.setGraphic(previousImageView);
-		previousDateButton.setOnAction(e -> {
-			this.setNewPlanDate(this.taskDate.minusDays(1));
+			Main.calendarPane.editTaskBox.setTask((MainTask)this.task);
 		});
 
-		//Next date button
-		Button nextDateButton = new Button();
-		nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		nextDateButton.setMinSize(34, 33);
-		nextDateButton.setMaxSize(34, 33);
-		Image nextImage = new Image(getClass().getResourceAsStream("/icons/ButtonNext.png"));
-		ImageView nextImageView = new ImageView(nextImage);
-		nextImageView.fitHeightProperty().bind(nextDateButton.heightProperty());
-		nextImageView.fitWidthProperty().bind(nextDateButton.widthProperty());
-		nextDateButton.setGraphic(nextImageView);
-		nextDateButton.setOnAction(e -> {
-			this.setNewPlanDate(this.taskDate.plusDays(1));
-		});
-
-		this.mainTaskBox.getChildren().addAll(taskButton, this.deleteButton, this.editButton);
-		
-		//Box for buttons
-		this.buttonBox.getChildren().addAll(addButton, previousDateButton, this.dateLabel, nextDateButton, confirmButton);
-		this.buttonBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
-		this.buttonBox.setAlignment(Pos.CENTER_LEFT);
-		this.buttonBox.setVisible(false);
-		this.buttonBox.setManaged(false);
+		this.mainTaskBox.getChildren().addAll(taskButton, this.editButton);
 		
 		//Set time, completed, expanded, editmode
 		this.setTime(task.getTime());
 		this.setCompleted(task.isCompleted());
 		this.setExpanded(task.isExpanded());
-		this.setEditMode(task.isEditMode());
 	}
 	
 	/**
@@ -223,10 +94,8 @@ public class MainTaskPane extends TaskPane {
 	 */
 	public void setTime(LocalTime time) {
 		if (time != null) {
-			this.taskTimeField.setText(time.format(DateTimeFormatter.ofPattern("HHmm")));
 			this.taskTimeLabel.setText(time.format(DateTimeFormatter.ofPattern("HH:mm")));
 		} else {
-			this.taskTimeField.setText("");
 			this.taskTimeLabel.setText("");
 			this.taskTimeLabel.setVisible(false);
 			this.taskTimeLabel.setManaged(false);
@@ -260,47 +129,11 @@ public class MainTaskPane extends TaskPane {
 		//Add subtaskpanes, set editmode
 		for (SubTask subTask : ((MainTask)this.task).getSubTaskList()) {
 			this.subTaskBox.getChildren().add(subTask.taskPane);
-			subTask.taskPane.setEditMode(((MainTask)this.task).isEditMode());
-		}
-	}
-
-	
-	/**
-	 * Sets MainTaskPane and linked SubTaskPanes editMode. Hides labels and shows fields to enable editing of name and time.
-	 * @param editMode
-	 */
-	public void setEditMode(Boolean editMode) {
-		super.setEditMode(editMode);
-		
-		//Set certain buttons as visible or invisible for editing task
-		this.taskTimeLabel.setVisible(!editMode);
-		this.taskTimeLabel.setManaged(!editMode);
-		this.editButton.setVisible(!editMode);
-		this.editButton.setManaged(!editMode);
-		
-		this.taskTimeField.setVisible(editMode);
-		this.taskTimeField.setManaged(editMode);
-		this.buttonBox.setVisible(editMode);
-		this.buttonBox.setManaged(editMode);
-
-		//Set subtaskpanes to editmode
-		for (SubTask subTask : ((MainTask)this.task).getSubTaskList()) {
-			subTask.taskPane.setEditMode(editMode);
 		}
 	}
 	
 	public void setExpanded(Boolean expanded) {
 		this.subTaskBox.setVisible(expanded);
 		this.subTaskBox.setManaged(expanded);
-	}
-
-	
-	/**
-	 * Set PlanDate of the MainTask to the date selected in the dateLabel.
-	 * @param date
-	 */
-	public void setNewPlanDate(LocalDate date) {
-		this.taskDate = date;
-		this.dateLabel.setText(taskDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 	}
 }
