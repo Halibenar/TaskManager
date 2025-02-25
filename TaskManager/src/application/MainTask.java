@@ -13,7 +13,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	private PlanDate planDate;
 	private LocalTime time;
 	private Boolean expanded;
-	private Boolean editMode;
 
 	private ArrayList<SubTask> subTaskList = new ArrayList<SubTask>();
 
@@ -28,7 +27,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		this.time = null;
 		this.completed = false;
 		this.expanded = false;
-		this.editMode = false;
 		this.taskPane = new MainTaskPane(this);
 	}
 
@@ -42,14 +40,13 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	 * @param expanded MainTaskPane expanded
 	 * @param editMode MainTaskPane editMode
 	 */
-	public MainTask(int iD, String name, PlanDate planDate, LocalTime time, Boolean completed, Boolean expanded, Boolean editMode) {
+	public MainTask(int iD, String name, PlanDate planDate, LocalTime time, Boolean completed, Boolean expanded) {
 		this.iD = iD;
 		this.name = name;
 		this.planDate = planDate;
 		this.time = time;
 		this.completed = completed;
 		this.expanded = expanded;
-		this.editMode = editMode;
 		this.taskPane = new MainTaskPane(this);
 	}
 
@@ -59,7 +56,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public void updateSQL() {
 		
 		//Get data to insert
-		String[] data = new String[6];
+		String[] data = new String[5];
 		data[0] = this.getName();
 		data[1] = this.getPlanDate().toString();
 		data[2] = null;
@@ -68,16 +65,15 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		}
 		data[3] = this.isCompleted().toString();
 		data[4] = this.isExpanded().toString();
-		data[5] = this.isEditMode().toString();
 
 		//If new task, add to database
 		if (this.getID() == 0) {
-			String insertString = "INSERT INTO tasks (Name, Date, Time, Completed, Expanded, Editmode) VALUES (?,?,?,?,?,?)";
+			String insertString = "INSERT INTO tasks (Name, Date, Time, Completed, Expanded) VALUES (?,?,?,?,?)";
 			this.setID(SQLConnector.insert(insertString, data));
 
 		//If already exists, update records
 		} else {
-			String updateString = "UPDATE tasks SET Name = ?, Date = ?, Time = ?, Completed = ?, Expanded = ?, Editmode = ? WHERE ID = " + this.getID();
+			String updateString = "UPDATE tasks SET Name = ?, Date = ?, Time = ?, Completed = ?, Expanded = ? WHERE ID = " + this.getID();
 			SQLConnector.update(updateString, data);
 		}
 	}
@@ -117,16 +113,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		this.expanded = expanded;
 		this.updateSQL();
 		((MainTaskPane)this.taskPane).setExpanded(expanded);
-	}
-	
-	public Boolean isEditMode() {
-		return editMode;
-	}
-
-	public void setEditMode(Boolean editMode) {
-		this.editMode = editMode;
-		this.updateSQL();
-		((MainTaskPane)this.taskPane).setEditMode(editMode);
 	}
 	
 	public ArrayList<SubTask> getSubTaskList() {
