@@ -9,13 +9,10 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import application.Main.ViewMode;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -24,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -35,7 +33,7 @@ import javafx.scene.text.Text;
  */
 public class CalendarPane extends VBox {
 
-	PlanDate planDate = new PlanDate(LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+	PlanDate planDate = new PlanDate(LocalDate.now());
 	ArrayList<PlanDate> retrievedDates = new ArrayList<PlanDate>();
 	VBox daysBox;
 	Button datePickerButton;
@@ -129,9 +127,25 @@ public class CalendarPane extends VBox {
 			planDate = new PlanDate(LocalDate.now());
 			this.update(this.currentViewMode);
 		});
+		
+		
+		//Add task button
+		Button addTaskButton = new Button();
+		addTaskButton.setMinSize(34, 33);
+		addTaskButton.setMaxSize(34, 33);
+		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"));
+		ImageView addImageView = new ImageView(addImage);
+		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
+		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
+		addTaskButton.setGraphic(addImageView);
+		addTaskButton.setOnAction(e -> {
+			MainTask newTask = new MainTask(this.planDate);
+			newTask.setName("New Task");
+			this.editTaskBox.setTask(newTask);
+		});
 
 		//Add to dateBar
-		dateBar.getChildren().addAll(this.previousDateButton, todayButton, this.weekButton, this.datePickerButton, this.nextDateButton);
+		dateBar.getChildren().addAll(this.previousDateButton, todayButton, addTaskButton, this.weekButton, this.datePickerButton, this.nextDateButton);
 		dateBar.getStyleClass().add("hbox");
 		
 		//Buttons for day selection
@@ -142,8 +156,8 @@ public class CalendarPane extends VBox {
 				this.dayButtons[i].setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 			}
 			this.dayButtons[i].setPadding(new Insets(0,0,0,0));
-			this.dayButtons[i].setMinSize(34, 33);
-			this.dayButtons[i].setMaxSize(Double.MAX_VALUE, 33);
+			this.dayButtons[i].setMinSize(30, 42);
+			this.dayButtons[i].setMaxSize(Double.MAX_VALUE, 42);
 			HBox.setHgrow(this.dayButtons[i], Priority.ALWAYS);
 			dayButtonBar.getChildren().add(this.dayButtons[i]);
 		}
@@ -174,19 +188,16 @@ public class CalendarPane extends VBox {
 
 		final int daysShown;
 		String titleString;
-		LocalDate startDate;
+		LocalDate weekStartDate = planDate.date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 		
 		//Get display info, title and starting date
 		if (this.currentViewMode == ViewMode.day) {
 			daysShown = 1;
-//			startDate = planDate.date;
-//			titleString = startDate.getDayOfWeek().toString() + " " + startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 		} else { //viewMode is week
 			daysShown = 7;
 		}
 		
-		startDate = planDate.date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-		titleString = "WEEK " + startDate.get(WeekFields.of(DayOfWeek.MONDAY, 4).weekOfWeekBasedYear()) + ", " + startDate.getMonth().toString() + " " + startDate.format(DateTimeFormatter.ofPattern("yyyy"));
+		titleString = "WEEK " + weekStartDate.get(WeekFields.of(DayOfWeek.MONDAY, 4).weekOfWeekBasedYear()) + ", " + weekStartDate.getMonth().toString() + " " + weekStartDate.format(DateTimeFormatter.ofPattern("yyyy"));
 	
 		//Clear
 		this.daysBox.getChildren().clear();
@@ -196,18 +207,23 @@ public class CalendarPane extends VBox {
 
 		//Set next and previous date buttons to skip specified number of days
 		this.nextDateButton.setOnAction(e -> {
-			planDate = new PlanDate(planDate.date.plusDays(7));
+			planDate = new PlanDate(weekStartDate.plusDays(7));
 			this.update(ViewMode.week);
 		});
 		this.previousDateButton.setOnAction(e -> {
-			planDate = new PlanDate(planDate.date.minusDays(7));
+			planDate = new PlanDate(weekStartDate.minusDays(7));
 			this.update(ViewMode.week);
 		});
 
 		//Set daybuttons to days
 		for (int i = 0; i < 7; i++) {
-			LocalDate buttonDate = startDate.plusDays(i);
-			this.dayButtons[i].setText(buttonDate.getDayOfWeek().toString().substring(0,3) + " " + buttonDate.format(DateTimeFormatter.ofPattern("dd")));
+			LocalDate buttonDate = weekStartDate.plusDays(i);
+			VBox buttonDisplay = new VBox();
+			buttonDisplay.setAlignment(Pos.BASELINE_CENTER);
+			Label buttonDayLabel = new Label(buttonDate.getDayOfWeek().toString().substring(0,3));
+			Label buttonDateLabel = new Label(buttonDate.format(DateTimeFormatter.ofPattern("dd")));
+			buttonDisplay.getChildren().addAll(buttonDayLabel, buttonDateLabel);
+			this.dayButtons[i].setGraphic(buttonDisplay);
 			this.dayButtons[i].setOnAction(e -> {
 				planDate = new PlanDate(buttonDate);
 				this.update(ViewMode.day);
@@ -257,7 +273,6 @@ public class CalendarPane extends VBox {
 			VBox overdueBox = new VBox();
 			overdueBox.setPadding(new Insets(0, 3, 3, 3));
 			overdueBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
-
 			overdueBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 			GridPane.setHgrow(overdueBox, Priority.ALWAYS);
 
@@ -280,40 +295,19 @@ public class CalendarPane extends VBox {
 			this.daysBox.getChildren().add(overdueBox);
 		}
 		
+		LocalDate startDate = this.planDate.date;
+		if (currentViewMode == ViewMode.week) {
+			startDate = weekStartDate;
+		}
+		
 		//Box in VBox for each day
-		for (int i1 = 0; i1 < daysShown; i1++) {
-			PlanDate showDate = new PlanDate(this.planDate.date.plusDays(i1));
+		for (int i = 0; i < daysShown; i++) {
+			PlanDate showDate = new PlanDate(startDate.plusDays(i));
 			showDate.getTasks();
 			VBox dayBox = showDate.createDayBox();
 			showDate.updateTaskBox();
 			this.daysBox.getChildren().add(dayBox);
 		}
-		
-		//Add task button
-		Button addTaskButton = new Button();
-		addTaskButton.setStyle("-fx-border-color: black; -fx-border-width: 1;");
-		addTaskButton.setMinSize(35, 35);
-		addTaskButton.setMaxSize(35, 35);
-		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"));
-		ImageView addImageView = new ImageView(addImage);
-		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
-		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
-		addTaskButton.setGraphic(addImageView);
-		addTaskButton.setOnAction(e -> {
-			MainTask newTask = new MainTask(this.planDate);
-			this.planDate.taskBox.getChildren().add(newTask.taskPane);
-			newTask.setExpanded(true);
-			newTask.updateSQL();
-			this.editTaskBox.setTask(newTask);
-			this.update(currentViewMode);
-		});
-		this.daysBox.getChildren().add(addTaskButton);
-
-//		if (daysShown == 7) {
-//			VBox weekBox = new VBox();
-//			weekBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
-//			this.daysGridPane.add(weekBox, 7 % rowLength, 7 / rowLength);
-//		}
 	}
 
 	/**
@@ -476,74 +470,127 @@ public class CalendarPane extends VBox {
 	public class EditTaskBox extends VBox {
 
 		private MainTask task;
-		private LocalDate newDate;
+		private MainTask copyTask;
 		
-		private Label editBoxTitleLabel;
 		private TextField taskNameField;
 		private TextField taskTimeField;
-		
+		private Label dateLabel;		
 		private VBox subTaskBox;
-		private Label dateLabel;
 
 		/**
 		 * Creates EditTaskBox to edit a MainTask and its SubTasks.
 		 * @param mainTask MainTask to display
 		 */
 		public EditTaskBox() {
-			this.setPadding(new Insets(3,3,3,3));
-			this.setSpacing(3);
 			HBox.setHgrow(this, Priority.ALWAYS);
 			this.setMaxWidth(Double.MAX_VALUE);
 			this.getStyleClass().add("hBoxTask");
 			this.setStyle("-fx-border-color: grey; -fx-border-width: 1;");
-			
-			//Editbox title label
-			this.editBoxTitleLabel = new Label();
-			this.getChildren().add(this.editBoxTitleLabel);
 
 			//Name title label
-			Label taskNameLabel = new Label("Name:");
-			taskNameLabel.setPrefWidth(50);
+			Label taskNameLabel = new Label("Main Task:");
+			taskNameLabel.setMinWidth(70);
+			taskNameLabel.setMaxWidth(70);
 			
 			//Name field
 			this.taskNameField = new TextField();
 			HBox.setHgrow(this.taskNameField, Priority.ALWAYS);
 			this.taskNameField.setMaxWidth(Double.MAX_VALUE);
+			HBox.setMargin(this.taskNameField, new Insets(0, 3, 0, 0));
 			
-			//HBox for task name
-			HBox taskNameBox = new HBox(10);
+			//Confirm button confirms editing
+			Button confirmButton = new Button();
+			//confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 1;");
+			confirmButton.setMinSize(34, 33);
+			confirmButton.setMaxSize(34, 33);
+			Image confirmImage = new Image(getClass().getResourceAsStream("/icons/ButtonConfirm.png"));
+			ImageView confirmImageView = new ImageView(confirmImage);
+			confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
+			confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
+			confirmButton.setGraphic(confirmImageView);
+			confirmButton.setOnAction(e -> {
+
+				//Set name
+				this.copyTask.setName(this.taskNameField.getText());
+				
+				//Set time
+				LocalTime time = null;
+				try {
+					time = LocalTime.parse(this.taskTimeField.getText(), DateTimeFormatter.ofPattern("HHmm"));
+				} catch (Exception ex) {
+				} finally {
+					this.copyTask.setTime(time);
+				}
+				
+				//Set date
+				this.copyTask.setPlanDate(new PlanDate(this.copyTask.getPlanDate().date));
+				
+				//Set SubTask names and remove deleted SubTasks
+				for (Node node : this.subTaskBox.getChildren()) {
+					if (node instanceof EditSubTaskBox) {
+						if (((EditSubTaskBox)node).deleted) {
+							((EditSubTaskBox)node).subTask.deleteSQL();
+						} else {
+							((EditSubTaskBox)node).subTask.setName(((EditSubTaskBox)node).subTaskNameField.getText());
+						}
+					}
+				}
+				
+				//Copy changes to original task
+				this.task = new MainTask(copyTask);
+				for (SubTask subTask : this.task.getSubTaskList()) {
+					subTask.updateSQL();
+				}
+				
+				//Rebuild maintasklist to change order
+				this.task.getPlanDate().updateTaskBox();
+				
+				//Update UI
+				Main.calendarPane.update(Main.calendarPane.currentViewMode);
+				this.setVisible(false);
+				this.setManaged(false);
+			});
+			
+			//Cancel button cancels editing
+			Button cancelButton = new Button();
+			//cancelButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 1;");
+			cancelButton.setMinSize(34, 33);
+			cancelButton.setMaxSize(34, 33);
+			Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"));
+			ImageView cancelImageView = new ImageView(cancelImage);
+			cancelImageView.fitHeightProperty().bind(cancelButton.heightProperty());
+			cancelImageView.fitWidthProperty().bind(cancelButton.widthProperty());
+			cancelButton.setGraphic(cancelImageView);
+			cancelButton.setOnAction(e -> {
+				this.setVisible(false);
+				this.setManaged(false);
+			});
+			
+			//HBox for task name, cancel and confirm buttons
+			HBox taskNameBox = new HBox();
+			taskNameBox.setPadding(new Insets(0,0,0,3));
 			taskNameBox.setAlignment(Pos.CENTER_LEFT);
-			taskNameBox.setMinHeight(25);
-			taskNameBox.setMaxHeight(25);
-			taskNameBox.getChildren().addAll(taskNameLabel, this.taskNameField);
-			this.getChildren().add(taskNameBox);
+			taskNameBox.getChildren().addAll(taskNameLabel, this.taskNameField, confirmButton, cancelButton);
 			
 			//Time title label
 			Label taskTimeLabel = new Label("Time:");
-			taskTimeLabel.setPrefWidth(50);
+			taskTimeLabel.setMinWidth(70);
+			taskTimeLabel.setMaxWidth(70);
 			
 			//Time field
-			this.taskTimeField = new TextField();
+			this.taskTimeField = new TimeTextField();
 			this.taskTimeField.setMinWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
 			this.taskTimeField.setMaxWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
-			
-//			//Completed title label
-//			Label taskCompletedLabel = new Label("Completed:");
-//			
-//			//Complete checkbox
-//			this.completeCheckBox = new CheckBox();
-//			this.completeCheckBox.setOnAction(e -> {
-//				task.setCompleted(!task.isCompleted());
-//				e.consume();
-//			});
+			HBox.setMargin(this.taskTimeField, new Insets(0, 10, 0, 0));
 			
 			//Date title label
 			Label taskDateLabel = new Label("Date:");
-			taskDateLabel.setPrefWidth(50);
+			taskDateLabel.setMinWidth(40);
+			taskDateLabel.setMaxWidth(40);
 			
 			//Previous date button
 			Button previousDateButton = new Button();
-			previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
+			previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 0;");
 			previousDateButton.setMinSize(34, 33);
 			previousDateButton.setMaxSize(34, 33);
 			Image previousImage = new Image(getClass().getResourceAsStream("/icons/ButtonPrevious.png"));
@@ -552,7 +599,7 @@ public class CalendarPane extends VBox {
 			previousImageView.fitWidthProperty().bind(previousDateButton.widthProperty());
 			previousDateButton.setGraphic(previousImageView);
 			previousDateButton.setOnAction(e -> {
-				this.setNewDate(this.newDate.minusDays(1));
+				this.setNewDate(this.copyTask.getPlanDate().date.minusDays(1));
 			});
 			
 			//Date label
@@ -560,7 +607,7 @@ public class CalendarPane extends VBox {
 
 			//Next date button
 			Button nextDateButton = new Button();
-			nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
+			nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 0;");
 			nextDateButton.setMinSize(34, 33);
 			nextDateButton.setMaxSize(34, 33);
 			Image nextImage = new Image(getClass().getResourceAsStream("/icons/ButtonNext.png"));
@@ -569,43 +616,17 @@ public class CalendarPane extends VBox {
 			nextImageView.fitWidthProperty().bind(nextDateButton.widthProperty());
 			nextDateButton.setGraphic(nextImageView);
 			nextDateButton.setOnAction(e -> {
-				this.setNewDate(this.newDate.plusDays(1));
+				this.setNewDate(this.copyTask.getPlanDate().date.plusDays(1));
 			});
 			
-			//HBox for task time and date
-			HBox taskTimeBox = new HBox(10);
-			taskTimeBox.setAlignment(Pos.CENTER_LEFT);
-			taskTimeBox.setMinHeight(25);
-			taskTimeBox.setMaxHeight(25);
-			taskTimeBox.getChildren().addAll(taskTimeLabel, this.taskTimeField, taskDateLabel, previousDateButton, this.dateLabel, nextDateButton);
-			this.getChildren().add(taskTimeBox);
+			//Empty region
+			Region emptyRegion2 = new Region();
+			HBox.setHgrow(emptyRegion2, Priority.ALWAYS);
+			emptyRegion2.setMaxWidth(Double.MAX_VALUE);
 			
-			//Delete button deletes maintask
-			Button deleteButton = new Button();
-			deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-			deleteButton.setMinSize(34, 33);
-			deleteButton.setMaxSize(34, 33);
-			deleteButton.setOnAction(e -> {
-				this.delete();
-			});
-			Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"));
-			ImageView cancelImageView = new ImageView(cancelImage);
-			cancelImageView.fitHeightProperty().bind(deleteButton.heightProperty());
-			cancelImageView.fitWidthProperty().bind(deleteButton.widthProperty());
-			deleteButton.setGraphic(cancelImageView);
-			
-			
-//			Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"));
-//			ImageView cancelImageView = new ImageView(cancelImage);
-//			cancelImageView.fitHeightProperty().bind(this.deleteButton.heightProperty());
-//			cancelImageView.fitWidthProperty().bind(this.deleteButton.widthProperty());
-//			this.deleteButton.setGraphic(cancelImageView);
-//			this.deleteButton.setVisible(false);
-//			this.deleteButton.setManaged(false);
-
 			//Add button adds new subtask
 			Button addButton = new Button();
-			addButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
+			//addButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 0 1;");
 			addButton.setMinSize(34, 33);
 			addButton.setMaxSize(34, 33);
 			Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonPlus.png"));
@@ -614,86 +635,51 @@ public class CalendarPane extends VBox {
 			addImageView.fitWidthProperty().bind(addButton.widthProperty());
 			addButton.setGraphic(addImageView);
 			addButton.setOnAction(e -> {
-				SubTask newTask = new SubTask(this.task);
-				(this.task).addToSubTaskList(newTask);
-				this.addSubTaskPanes();
+				SubTask newTask = new SubTask(this.copyTask);
+				this.copyTask.addToSubTaskList(newTask);
+				this.subTaskBox.getChildren().add(new EditSubTaskBox(newTask));
 			});
 			
-			//Confirm button
-			Button confirmButton = new Button();
-			confirmButton.setMinSize(34, 33);
-			confirmButton.setMaxSize(34, 33);
-			Image confirmImage = new Image(getClass().getResourceAsStream("/icons/ButtonConfirm.png"));
-			ImageView confirmImageView = new ImageView(confirmImage);
-			confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
-			confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
-			confirmButton.setGraphic(confirmImageView);
-			confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-			confirmButton.setOnAction(e -> {
-
-				//Set task variables
-				this.task.setName(this.taskNameField.getText());
-				LocalTime time = null;
-				try {
-					time = LocalTime.parse(this.taskTimeField.getText(), DateTimeFormatter.ofPattern("HHmm"));
-				} catch (Exception ex) {
-					
-				} finally {
-					((MainTask)this.task).setTime(time);
-				}
-				
-				//Move task
-				((MainTask)this.task).setPlanDate(new PlanDate(newDate));
-				
-				//Set subtask name changes and delete if chosen
-				for(Node node : this.subTaskBox.getChildren()) {
-					if (node instanceof EditSubTaskBox)
-					{
-						if (((EditSubTaskBox)node).isDeleted()) {
-							((EditSubTaskBox)node).subTask.deleteSQL();
-						} else {
-							((EditSubTaskBox)node).setSubTaskName();
-						}
-					}
-				}
-				
-				//Update subtask display
-				this.addSubTaskPanes();
-				
-				//Rebuild maintasklist to change order
-				((MainTask)this.task).getPlanDate().updateTaskBox();
-				
-				//Update UI
-				Main.calendarPane.update(Main.calendarPane.currentViewMode);
-				this.setVisible(false);
-				this.setManaged(false);
+			//Delete button deletes maintask
+			Button deleteButton = new Button();
+			//deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
+			deleteButton.setMinSize(34, 33);
+			deleteButton.setMaxSize(34, 33);
+			deleteButton.setOnAction(e -> {
+				this.delete();
 			});
+			Image deleteImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"));
+			ImageView deleteImageView = new ImageView(deleteImage);
+			deleteImageView.fitHeightProperty().bind(deleteButton.heightProperty());
+			deleteImageView.fitWidthProperty().bind(deleteButton.widthProperty());
+			deleteButton.setGraphic(deleteImageView);
 			
-			//HBox for control buttons
-			HBox buttonBox = new HBox();
-			buttonBox.getChildren().addAll(addButton, deleteButton, confirmButton);
-			buttonBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
-			buttonBox.setAlignment(Pos.CENTER_LEFT);
-			this.getChildren().add(buttonBox);
+			//HBox for task time and date
+			HBox taskTimeBox = new HBox();
+			taskTimeBox.setPadding(new Insets(0,0,0,3));
+			taskTimeBox.setAlignment(Pos.CENTER_LEFT);
+			taskTimeBox.getChildren().addAll(taskTimeLabel, this.taskTimeField, taskDateLabel, previousDateButton, this.dateLabel, nextDateButton, emptyRegion2, addButton, deleteButton);
 			
 			//VBox for subtasks
 			this.subTaskBox = new VBox();
 			this.subTaskBox.setPadding(new Insets(0,0,0,34));
-			this.getChildren().add(this.subTaskBox);
+			this.getChildren().addAll(taskNameBox, taskTimeBox, this.subTaskBox);
 		}
 		
 		public void setTask(MainTask task) {
+			this.subTaskBox.getChildren().clear();
 			this.task = task;
-			this.editBoxTitleLabel.setText("Editing task " + this.task.getName());
-			this.taskNameField.setText(this.task.getName());
-			if (this.task.getTime() != null) {
-				this.taskTimeField.setText(this.task.getTime().format(DateTimeFormatter.ofPattern("HHmm")));
+			this.copyTask = new MainTask(task);
+			this.taskNameField.setText(this.copyTask.getName());
+			if (this.copyTask.getTime() != null) {
+				this.taskTimeField.setText(this.copyTask.getTime().format(DateTimeFormatter.ofPattern("HHmm")));
 			} else {
 				this.taskTimeField.setText("");
 			}
-			//this.completeCheckBox.setSelected(this.task.isCompleted());
-			this.setNewDate(this.task.getPlanDate().date);
-			this.addSubTaskPanes();
+			this.setNewDate(this.copyTask.getPlanDate().date);
+			for (SubTask subTask : this.copyTask.getSubTaskList()) {
+				this.subTaskBox.getChildren().add(new EditSubTaskBox(subTask));
+			}
 			this.setVisible(true);
 			this.setManaged(true);
 		}
@@ -703,22 +689,19 @@ public class CalendarPane extends VBox {
 		 * @param date
 		 */
 		public void setNewDate(LocalDate date) {
-			this.newDate = date;
-			this.dateLabel.setText(this.newDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+			this.copyTask.getPlanDate().date = date;
+			this.dateLabel.setText(this.copyTask.getPlanDate().date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 		}
 		
 		/**
 		 * Adds the TaskPanes of SubTasks belonging to the MainTask to the MainTaskPane.
 		 */
-		public void addSubTaskPanes() {		
-			//Clear box
-			this.subTaskBox.getChildren().clear();
-			
-			//Add subtaskpanes
-			for (SubTask subTask : this.task.getSubTaskList()) {
-				EditSubTaskBox editSubTaskBox = new EditSubTaskBox(subTask);
+		public void addSubTaskBox(EditSubTaskBox editSubTaskBox) {		
 				this.subTaskBox.getChildren().add(editSubTaskBox);
-			}
+		}
+		
+		public void removeSubTaskBox(EditSubTaskBox editSubTaskBox) {
+			
 		}
 		
 		/**
@@ -741,10 +724,12 @@ public class CalendarPane extends VBox {
 			
 			public EditSubTaskBox (SubTask subTask) {
 				this.subTask = subTask;
+				this.setSpacing(3);
+				this.setAlignment(Pos.CENTER_LEFT);
 				
 				//Name title label
-				Label subTaskNameLabel = new Label("Name:");
-				subTaskNameLabel.setPrefWidth(50);
+				Label subTaskNameLabel = new Label("Sub Task:");
+				subTaskNameLabel.setPrefWidth(60);
 				
 				//Name field
 				this.subTaskNameField = new TextField(this.subTask.getName());
@@ -753,34 +738,26 @@ public class CalendarPane extends VBox {
 				
 				//Delete button deletes subtask
 				Button deleteButton = new Button();
-				deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
+				//deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 0 1;");
 				deleteButton.setMinSize(34, 33);
 				deleteButton.setMaxSize(34, 33);
 				deleteButton.setOnAction(e -> {
-					this.setDeleted();
+					this.subTask.getMainTask().removeFromSubTaskList(this.subTask);
+					this.deleted = true;
+					this.setVisible(false);
+					this.setManaged(false);
 				});
-				Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"));
+				Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"));
 				ImageView cancelImageView = new ImageView(cancelImage);
 				cancelImageView.fitHeightProperty().bind(deleteButton.heightProperty());
 				cancelImageView.fitWidthProperty().bind(deleteButton.widthProperty());
 				deleteButton.setGraphic(cancelImageView);
-				
 				
 				this.getChildren().addAll(subTaskNameLabel, subTaskNameField, deleteButton);
 			}
 			
 			public void setSubTaskName() {
 				this.subTask.setName(subTaskNameField.getText());
-			}
-			
-			public void setDeleted() {
-				this.deleted = true;
-				this.setVisible(false);
-				this.setManaged(false);
-			}
-			
-			public Boolean isDeleted() {
-				return this.deleted;
 			}
 		}
 	}

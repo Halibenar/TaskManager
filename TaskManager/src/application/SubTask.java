@@ -35,6 +35,17 @@ public class SubTask extends Task implements Comparable<SubTask> {
 		this.completed = completed;
 		this.taskPane = new TaskPane(this);
 	}
+	
+	/*
+	 * Constructor for copying another SubTask.
+	 * @param SubTask SubTask to be copied
+	 */
+	public SubTask(SubTask another) {
+		this.iD = another.iD;
+		this.name = another.name;
+		this.completed = another.completed;
+		this.taskPane = another.taskPane;
+	}
 
 	/**
 	 * Update SQLite database entry of this MainTask with new values

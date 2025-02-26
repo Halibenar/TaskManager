@@ -49,6 +49,27 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		this.expanded = expanded;
 		this.taskPane = new MainTaskPane(this);
 	}
+	
+	/*
+	 * Constructor for copying another MainTask.
+	 * @param MainTask MainTask to be copied
+	 */
+	public MainTask(MainTask another) {
+		this.iD = another.iD;
+		this.name = another.name;
+		this.planDate = another.planDate;
+		this.time = another.time;
+		this.completed = another.completed;
+		this.expanded = another.expanded;
+		this.taskPane = another.taskPane;
+		
+		//Deep copy of subtasks
+		for (SubTask subTask : another.subTaskList) {
+			SubTask newSubTask = new SubTask(subTask);
+			newSubTask.setMainTask(this);
+			this.subTaskList.add(newSubTask);
+		}
+	}
 
 	/**
 	 * Update SQLite database entry of this MainTask with new values
@@ -118,11 +139,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public ArrayList<SubTask> getSubTaskList() {
 		this.subTaskList.sort(null);
 		return this.subTaskList;
-	}
-
-	public void setSubTaskList(ArrayList<SubTask> subTaskList) {
-		this.subTaskList = subTaskList;
-		((MainTaskPane)this.taskPane).addSubTaskPanes();
 	}
 
 	public void addToSubTaskList(SubTask subTask) {
