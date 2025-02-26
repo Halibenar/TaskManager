@@ -3,14 +3,17 @@ package application;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -30,15 +33,6 @@ public class PlanDate {
 	 */
 	public PlanDate(LocalDate date) {
 		this.date = date;
-	}
-
-	/**
-	 * Creates copy of a PlanDate.
-	 * @param another PlanDate to copy
-	 */
-	public PlanDate (PlanDate another) {
-		this.date = another.date;
-		this.taskList = another.taskList;
 	}
 	
 	@Override
@@ -106,15 +100,18 @@ public class PlanDate {
 		GridPane.setVgrow(dayBox, Priority.ALWAYS);
 
 		//Day of week label
-		Label dayOfWeekLabel = new Label(this.date.getDayOfWeek().toString().substring(0,3) + " " + this.toString().substring(8, 10));
-		dayOfWeekLabel.setFont(new Font(dayOfWeekLabel.getFont().getName(), 12));
+		HBox titleBox = new HBox();
+		Label dayOfWeekLabel = new Label(this.date.getDayOfWeek().toString().substring(0,3));
+		dayOfWeekLabel.setMinWidth(40);
+		Label dateLabel = new Label(this.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		titleBox.getChildren().addAll(dayOfWeekLabel, dateLabel);
 
 		//Labels for tasks with spacing of 3 between tasks and between following add task button
 		this.taskBox = new VBox();
 		this.taskBox.setSpacing(3);
 		this.taskBox.setPadding(new Insets(0, 0, 3, 0));
 
-		dayBox.getChildren().addAll(dayOfWeekLabel, this.taskBox);
+		dayBox.getChildren().addAll(titleBox, this.taskBox);
 
 		return dayBox;
 	}
