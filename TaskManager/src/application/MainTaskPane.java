@@ -68,9 +68,9 @@ public class MainTaskPane extends TaskPane {
 		
 		//Edit button toggles edit mode for main and subtasks
 		this.editButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		this.editButton.setMinSize(34, 33);
-		this.editButton.setMaxSize(34, 33);
-		Image editImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"));
+		this.editButton.setMinSize(34, 34);
+		this.editButton.setMaxSize(34, 34);
+		Image editImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"), 34, 34, true, true);
 		ImageView editImageView = new ImageView(editImage);
 		editImageView.fitHeightProperty().bind(this.editButton.heightProperty());
 		editImageView.fitWidthProperty().bind(this.editButton.widthProperty());
@@ -82,9 +82,9 @@ public class MainTaskPane extends TaskPane {
 		this.mainTaskBox.getChildren().addAll(taskButton, this.editButton);
 		
 		//Set time, completed, expanded, editmode
-		this.setTime(task.getTime());
-		this.setCompleted(task.isCompleted());
-		this.setExpanded(task.isExpanded());
+		this.setTime(((MainTask)this.task).getTime());
+		this.setCompleted(((MainTask)this.task).isCompleted());
+		this.setExpanded(((MainTask)this.task).isExpanded());
 	}
 	
 	/**

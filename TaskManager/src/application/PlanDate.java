@@ -93,7 +93,7 @@ public class PlanDate {
 	public VBox createDayBox() {
 		VBox dayBox = new VBox();
 		dayBox.setPadding(new Insets(0, 3, 3, 3));
-		dayBox.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
+		dayBox.setStyle("-fx-border-color: grey; -fx-border-width: 1;");
 		
 		dayBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		GridPane.setHgrow(dayBox, Priority.ALWAYS);
