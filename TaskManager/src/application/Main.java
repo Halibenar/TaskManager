@@ -147,12 +147,21 @@ public class Main extends Application {
 			agendaButton.setOnAction(e -> {
 				menuBarButtonEvent((Button)e.getSource(), calendarPane);
 			});
+			Button toDoButton = new Button("To Do");
+			toDoButton.setMinWidth(buttonWidth);
+			toDoButton.setMaxWidth(Double.MAX_VALUE);
+			HBox.setHgrow(toDoButton, Priority.ALWAYS);
+			toDoButton.setPadding(new Insets(4, 2, 4, 2));
+			toDoButton.setOnAction(e -> {
+				//TODO: Show to do pane
+			});
+
 			//HBox for buttons
 			this.buttonBox = new HBox();
 			this.buttonBox.setAlignment(Pos.TOP_LEFT);
 			this.buttonBox.setMaxWidth(Double.MAX_VALUE);
 			HBox.setHgrow(this.buttonBox, Priority.ALWAYS);
-			this.buttonBox.getChildren().addAll(agendaButton);
+			this.buttonBox.getChildren().addAll(agendaButton, toDoButton);
 			
 			//Add boxes to bar
 			this.getChildren().addAll(this.buttonBox, dateBox);
