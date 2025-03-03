@@ -51,12 +51,13 @@ public class MainTaskPane extends TaskPane {
 
 		//Button to hold the HBox
 		Button taskButton = new Button();
+		taskButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
 		taskButton.setAlignment(Pos.CENTER_LEFT);
-		taskButton.setPadding(new Insets(3,9,3,8));
 		taskButton.setContentDisplay(ContentDisplay.LEFT);
 		taskButton.setGraphic(taskBox);
 		HBox.setHgrow(taskButton, Priority.ALWAYS);
 		taskButton.setMaxWidth(Double.MAX_VALUE);
+		taskButton.setPrefHeight(34);
 		this.getChildren().add(taskButton);
 		
 		//Button toggles expanded property and visibility of subtasks, if there are any
@@ -67,7 +68,6 @@ public class MainTaskPane extends TaskPane {
 		});
 		
 		//Edit button toggles edit mode for main and subtasks
-		this.editButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
 		this.editButton.setMinSize(34, 34);
 		this.editButton.setMaxSize(34, 34);
 		Image editImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"), 34, 34, true, true);
@@ -113,10 +113,6 @@ public class MainTaskPane extends TaskPane {
 		} else {
 			this.taskTimeLabel.getStyleClass().clear();
 		}
-		
-		//rebuild maintasklist to change order
-		((MainTask)this.task).getPlanDate().updateTaskBox();
-		
 	}
 	
 	/**

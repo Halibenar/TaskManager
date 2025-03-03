@@ -92,6 +92,6 @@ public class TaskPane extends VBox {
 			((SubTask)this.task).getMainTask().removeFromSubTaskList((SubTask)this.task);
 		}
 		//Update UI
-		Main.calendarPane.update(Main.calendarPane.currentViewMode);
+		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 }

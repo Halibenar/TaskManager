@@ -71,6 +71,7 @@ public class Main extends Application {
 		
 		//Create panes and menubar
 		Main.calendarPane = new CalendarPane();
+		Main.calendarPane.setPlanDate(LocalDate.now());
 		Main.mainMenuBar = new MainMenuBar();
 		
 		//Set menu at top
