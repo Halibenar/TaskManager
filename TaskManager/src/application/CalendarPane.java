@@ -229,13 +229,13 @@ public class CalendarPane extends VBox {
 		}
 		
 		//Get list of overdue tasks from database, display tasklistbox if there are any
-		if (TaskList.getTaskList(LocalDate.now(), TaskList.ReadMode.overDue).size() > 0) {
-			this.daysBox.getChildren().add(TaskList.getTaskListBox(LocalDate.now(), TaskList.ReadMode.overDue));
+		if (Task.getTaskList(LocalDate.now(), Task.ReadMode.overDue).size() > 0) {
+			this.daysBox.getChildren().add(Task.getTaskListBox(LocalDate.now(), Task.ReadMode.overDue));
 		}
 		
 		//Display tasklistbox with tasks for every day
 		for (LocalDate showDate : showDates) {
-			this.daysBox.getChildren().add(TaskList.getTaskListBox(showDate, TaskList.ReadMode.forDate));
+			this.daysBox.getChildren().add(Task.getTaskListBox(showDate, Task.ReadMode.forDate));
 		}
 	}
 	
