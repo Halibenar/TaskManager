@@ -1,5 +1,6 @@
 package application;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  */
 public class MainTask extends Task implements Comparable<MainTask> {
 
-	private PlanDate planDate;
+	private LocalDate planDate;
 	private LocalTime time;
 	private Boolean expanded;
 
@@ -20,7 +21,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	 * Constructor for new MainTask on a PlanDate.
 	 * @param planDate Date the task should be planned on
 	 */
-	public MainTask(PlanDate planDate) {
+	public MainTask(LocalDate planDate) {
 		this.iD = 0;
 		this.name = "";
 		this.planDate = planDate;
@@ -40,7 +41,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	 * @param expanded MainTaskPane expanded
 	 * @param editMode MainTaskPane editMode
 	 */
-	public MainTask(int iD, String name, PlanDate planDate, LocalTime time, Boolean completed, Boolean expanded) {
+	public MainTask(int iD, String name, LocalDate planDate, LocalTime time, Boolean completed, Boolean expanded) {
 		this.iD = iD;
 		this.name = name;
 		this.planDate = planDate;
@@ -107,11 +108,11 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		SQLConnector.delete("DELETE FROM subtasks WHERE MainTaskID = '" + this.getID() + "'");
 	}
 	
-	public PlanDate getPlanDate() {
+	public LocalDate getPlanDate() {
 		return planDate;
 	}
 
-	public void setPlanDate(PlanDate planDate) {
+	public void setPlanDate(LocalDate planDate) {
 		this.planDate = planDate;
 		this.updateSQL();
 	}
