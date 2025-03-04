@@ -101,6 +101,10 @@ public class MainTask extends Task implements Comparable<MainTask> {
 			String updateString = "UPDATE tasks SET Name = ?, Date = ?, Time = ?, Completed = ?, Expanded = ? WHERE ID = " + this.getID();
 			SQLConnector.update(updateString, data);
 		}
+		
+		//Update UI
+		Main.toDoPane.getTasks();
+		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
 	/**
@@ -109,6 +113,10 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public void deleteSQL() {
 		SQLConnector.delete("DELETE FROM tasks WHERE ID = '" + this.getID() + "'");
 		SQLConnector.delete("DELETE FROM subtasks WHERE MainTaskID = '" + this.getID() + "'");
+		
+		//Update UI
+		Main.toDoPane.getTasks();
+		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
 	public LocalDate getPlanDate() {

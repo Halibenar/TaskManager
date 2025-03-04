@@ -91,7 +91,5 @@ public class TaskPane extends VBox {
 		if (this.task instanceof SubTask) {
 			((SubTask)this.task).getMainTask().removeFromSubTaskList((SubTask)this.task);
 		}
-		//Update UI
-		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 }
