@@ -99,14 +99,11 @@ public class EditTaskBox extends VBox {
 			
 			//Copy changes to original task
 			this.task = new MainTask(copyTask);
-			this.task.updateSQL();
 			for (SubTask subTask : this.task.getSubTaskList()) {
 				subTask.updateSQL();
 			}
-			
-			//Update UI
-			Main.toDoPane.getTasks();
-			Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
+			this.task.updateSQL();
+
 			this.setVisible(false);
 			this.setManaged(false);
 		});
@@ -328,10 +325,6 @@ public class EditTaskBox extends VBox {
 		this.task.deleteSQL();
 		this.setVisible(false);
 		this.setManaged(false);
-		
-		//Update UI
-		Main.toDoPane.getTasks();
-		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
 	public class EditSubTaskBox extends HBox {

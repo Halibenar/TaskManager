@@ -23,6 +23,8 @@ public class MainTaskPane extends TaskPane {
 	private HBox mainTaskBox = new HBox();
 	private VBox subTaskBox = new VBox();
 	private HBox buttonBox = new HBox();
+	private Label subTaskCountLabel = new Label();
+	private Button expandButton = new Button();
 	private Label taskTimeLabel = new Label();
 	private Button editButton = new Button();
 
@@ -39,6 +41,28 @@ public class MainTaskPane extends TaskPane {
 		this.getChildren().addAll(this.buttonBox, this.mainTaskBox, this.subTaskBox);
 		this.subTaskBox.setPadding(new Insets(0,0,0,34));
 		
+		//Subtask expand labels for subtaskcount and expansion status on the expand button
+		Label expandLabel = new Label();
+		if (((MainTask)this.task).isExpanded()) {
+			expandLabel.setText(" ^");
+		} else {
+			expandLabel.setText(" V");
+		}
+		HBox expandButtonBox = new HBox();
+		expandButtonBox.setAlignment(Pos.CENTER_LEFT);
+		expandButtonBox.getChildren().addAll(this.subTaskCountLabel, expandLabel);
+
+		//Subtask expand button, only visible if subtasks are added in addSubTaskPanes
+		this.expandButton.setMinSize(34, 34);
+		this.expandButton.setMaxSize(34, 34);
+		this.expandButton.setGraphic(expandButtonBox);
+		this.expandButton.setOnAction(e -> {
+			if (((MainTask)this.task).getSubTaskList().size() > 0) {
+				((MainTask)this.task).setExpanded(!((MainTask)this.task).isExpanded());
+			}
+		});
+		this.expandButton.setVisible(false);
+		
 		//Time label
 		this.taskTimeLabel.setAlignment(Pos.CENTER_LEFT);
 		this.taskTimeLabel.setPadding(new Insets(0,7,0,7));
@@ -47,27 +71,18 @@ public class MainTaskPane extends TaskPane {
 
 		//Rebuild Hbox
 		this.taskBox.getChildren().clear();
-		this.taskBox.getChildren().addAll(this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel);
+		this.taskBox.getChildren().addAll(this.completeCheckBox, expandButton, this.taskTimeLabel, this.taskNameLabel);
 
 		//Button to hold the HBox
-		Button taskButton = new Button();
-		taskButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
-		taskButton.setAlignment(Pos.CENTER_LEFT);
-		taskButton.setContentDisplay(ContentDisplay.LEFT);
-		taskButton.setGraphic(taskBox);
-		HBox.setHgrow(taskButton, Priority.ALWAYS);
-		taskButton.setMaxWidth(Double.MAX_VALUE);
-		taskButton.setPrefHeight(34);
-		this.getChildren().add(taskButton);
+		this.taskBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
+		this.taskBox.setPadding(new Insets(0, 0, 0, 9));
+		this.taskBox.setAlignment(Pos.CENTER_LEFT);
+		HBox.setHgrow(this.taskBox, Priority.ALWAYS);
+		this.taskBox.setMaxWidth(Double.MAX_VALUE);
+		this.taskBox.setMinHeight(34);
+		this.taskBox.setMaxHeight(34);
 		
-		//Button toggles expanded property and visibility of subtasks, if there are any
-		taskButton.setOnAction(e -> {
-			if (((MainTask)this.task).getSubTaskList().size() > 0) {
-				((MainTask)this.task).setExpanded(!((MainTask)this.task).isExpanded());
-			}
-		});
-		
-		//Edit button toggles edit mode for main and subtasks
+		//Edit button opens editTaskPane for this task
 		this.editButton.setMinSize(34, 34);
 		this.editButton.setMaxSize(34, 34);
 		Image editImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"), 34, 34, true, true);
@@ -83,7 +98,7 @@ public class MainTaskPane extends TaskPane {
 			}
 		});
 
-		this.mainTaskBox.getChildren().addAll(taskButton, this.editButton);
+		this.mainTaskBox.getChildren().addAll(taskBox, this.editButton);
 		
 		//Set time, completed, expanded, editmode
 		this.setTime(((MainTask)this.task).getTime());
@@ -126,9 +141,17 @@ public class MainTaskPane extends TaskPane {
 		//Clear box
 		this.subTaskBox.getChildren().clear();
 		
-		//Add subtaskpanes, set editmode
+		//Add subtaskpanes
 		for (SubTask subTask : ((MainTask)this.task).getSubTaskList()) {
 			this.subTaskBox.getChildren().add(subTask.taskPane);
+		}
+		
+		//Set expand button text
+		this.subTaskCountLabel.setText(Integer.toString(((MainTask)this.task).getSubTaskList().size()));
+		if (((MainTask)this.task).getSubTaskList().size() == 0) {
+			this.expandButton.setVisible(false);
+		} else {
+			this.expandButton.setVisible(true);
 		}
 	}
 	
