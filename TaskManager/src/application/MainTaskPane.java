@@ -76,7 +76,11 @@ public class MainTaskPane extends TaskPane {
 		editImageView.fitWidthProperty().bind(this.editButton.widthProperty());
 		this.editButton.setGraphic(editImageView);
 		this.editButton.setOnAction(e -> {
-			Main.calendarPane.editTaskBox.setTask((MainTask)this.task);
+			if (((MainTask)this.task).getPlanDate() != null) {
+				Main.calendarPane.editTaskBox.setTask((MainTask)this.task);
+			} else {
+				Main.toDoPane.editTaskBox.setTask((MainTask)this.task);
+			}
 		});
 
 		this.mainTaskBox.getChildren().addAll(taskButton, this.editButton);

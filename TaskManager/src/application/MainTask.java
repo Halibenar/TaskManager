@@ -80,7 +80,10 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		//Get data to insert
 		String[] data = new String[5];
 		data[0] = this.getName();
-		data[1] = this.getPlanDate().toString();
+		data[1] = null;
+		if (this.getPlanDate() != null) {
+			data[1] = this.getPlanDate().toString();
+		}
 		data[2] = null;
 		if (this.getTime() != null) {
 			data[2] = this.getTime().toString().substring(0,5);
@@ -114,7 +117,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 
 	public void setPlanDate(LocalDate planDate) {
 		this.planDate = planDate;
-		this.updateSQL();
 	}
 
 	public LocalTime getTime() {
@@ -123,7 +125,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 
 	public void setTime(LocalTime time) {
 		this.time = time;
-		this.updateSQL();
 		((MainTaskPane)this.taskPane).setTime(time);
 	}
 	
@@ -133,8 +134,8 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	
 	public void setExpanded(Boolean expanded) {
 		this.expanded = expanded;
-		this.updateSQL();
 		((MainTaskPane)this.taskPane).setExpanded(expanded);
+		this.updateSQL();
 	}
 	
 	public ArrayList<SubTask> getSubTaskList() {
