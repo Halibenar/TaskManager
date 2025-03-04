@@ -26,7 +26,7 @@ public abstract class Task {
 	
 	//Viewmode for viewing the agenda per day or week, used as parameter in getTaskList
 	public static enum ReadMode {
-		forDate, overDue
+		forDate, overDue, toDo
 	}
 
 	public int getID() {
@@ -43,7 +43,6 @@ public abstract class Task {
 
 	public void setName(String name) {
 		this.name = name;
-		this.updateSQL();
 		this.taskPane.setName(name);
 	}
 
@@ -53,8 +52,8 @@ public abstract class Task {
 
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
-		this.updateSQL();
 		this.taskPane.setCompleted(completed);
+		this.updateSQL();
 	}
 	
 	public abstract void updateSQL();
@@ -81,6 +80,10 @@ public abstract class Task {
 			Label overdueLabel = new Label("OVERDUE");
 			overdueLabel.setFont(new Font(overdueLabel.getFont().getName(), 12));
 			titleBox.getChildren().add(overdueLabel);
+		} else if (readMode == ReadMode.toDo) {
+			Label toDoLabel = new Label("TO DO");
+			toDoLabel.setFont(new Font(toDoLabel.getFont().getName(), 12));
+			titleBox.getChildren().add(toDoLabel);
 		}
 		
 		VBox taskListBox = new VBox();
@@ -113,11 +116,12 @@ public abstract class Task {
 		//Set SQLString
 		String SQLString = "SELECT * FROM tasks WHERE Date ";
 		if (readMode == ReadMode.forDate) {
-			SQLString += "=";
+			SQLString += "= '" + date.toString() + "'";
 		} else if (readMode == ReadMode.overDue) {
-			SQLString += "<";
+			SQLString += "< '" + date.toString() + "'";
+		} else if (readMode == ReadMode.toDo) {
+			SQLString += "IS null";
 		}
-		SQLString += "'" + date.toString() + "'";
 
 		//Get tasks from database
 		SQLConnector.read(SQLString, rs -> {

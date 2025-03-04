@@ -35,6 +35,7 @@ public class Main extends Application {
 	//Root pane, menubar, and panes for different views
 	BorderPane root = new BorderPane();
 	static CalendarPane calendarPane;
+	static ToDoPane toDoPane;
 	static MainMenuBar mainMenuBar;
 
 	/**
@@ -50,11 +51,11 @@ public class Main extends Application {
 		//Check database for tables
 		ArrayList<String> tableStrings = new ArrayList<String>();
 		
-		//Task table
+		//Maintask table
 		tableStrings.add("CREATE TABLE IF NOT EXISTS tasks (" +
 				  "	ID INTEGER PRIMARY KEY," +
 				  "	Name VARCHAR(100) NOT NULL," +
-				  "	Date DATE NOT NULL," +
+				  "	Date DATE," +
 				  "	Time TEXT," +
 				  "	Completed INTYINT(1) NOT NULL," +
 				  "	Expanded INTYINT(1) NOT NULL" +
@@ -72,6 +73,7 @@ public class Main extends Application {
 		//Create panes and menubar
 		Main.calendarPane = new CalendarPane();
 		Main.calendarPane.setPlanDate(LocalDate.now());
+		Main.toDoPane = new ToDoPane();
 		Main.mainMenuBar = new MainMenuBar();
 		
 		//Set menu at top
@@ -154,7 +156,7 @@ public class Main extends Application {
 			HBox.setHgrow(toDoButton, Priority.ALWAYS);
 			toDoButton.setPadding(new Insets(4, 2, 4, 2));
 			toDoButton.setOnAction(e -> {
-				//TODO: Show to do pane
+				menuBarButtonEvent((Button)e.getSource(), toDoPane);
 			});
 
 			//HBox for buttons

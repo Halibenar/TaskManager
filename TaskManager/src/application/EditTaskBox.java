@@ -24,9 +24,12 @@ public class EditTaskBox extends VBox {
 	
 	private TextField taskNameField;
 	private RestrictedTextField taskTimeField;
-	private RestrictedTextField taskDateField;		
+	private RestrictedTextField taskDateField;
+	private HBox taskDateBox;
 	private VBox subTaskBox;
 
+	private Boolean taskHasDate;
+	
 	/**
 	 * Creates EditTaskBox to edit a MainTask and its SubTasks.
 	 * @param mainTask MainTask to display
@@ -38,9 +41,9 @@ public class EditTaskBox extends VBox {
 		this.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 1 1;");
 		
 		//Name title label
-		Label taskNameLabel = new Label("Main Task:");
-		taskNameLabel.setMinWidth(70);
-		taskNameLabel.setMaxWidth(70);
+		Label taskNameLabel = new Label("Name:");
+		taskNameLabel.setMinWidth(45);
+		taskNameLabel.setMaxWidth(45);
 		
 		//Name field
 		this.taskNameField = new TextField();
@@ -62,37 +65,47 @@ public class EditTaskBox extends VBox {
 
 			//Set name
 			this.copyTask.setName(this.taskNameField.getText());
-			
-			//Set time
-			LocalTime time = null;
-			try {
-				time = LocalTime.parse(this.taskTimeField.getText(), DateTimeFormatter.ofPattern("HHmm"));
-			} catch (Exception ex) {
-			} finally {
-				this.copyTask.setTime(time);
+
+			//Set date and time if task is on the agenda, otherwise set both to null
+			if (this.taskHasDate) {
+				//Set time
+				LocalTime time = null;
+				try {
+					time = LocalTime.parse(this.taskTimeField.getText(), DateTimeFormatter.ofPattern("HHmm"));
+				} catch (Exception ex) {
+				} finally {
+					this.copyTask.setTime(time);
+				}
+
+				//Set date
+				this.copyTask.setPlanDate(this.copyTask.getPlanDate());
+			} else {
+				//Set time
+				this.copyTask.setTime(null);
+				//Set date
+				this.copyTask.setPlanDate(null);
 			}
-			
-			//Set date
-			this.copyTask.setPlanDate(this.copyTask.getPlanDate());
 			
 			//Set SubTask names and remove deleted SubTasks
 			for (Node node : this.subTaskBox.getChildren()) {
 				if (node instanceof EditSubTaskBox) {
-					if (((EditSubTaskBox)node).deleted) {
-						((EditSubTaskBox)node).subTask.deleteSQL();
+					if (((EditSubTaskBox)node).getDeleted()) {
+						((EditSubTaskBox)node).getSubTask().deleteSQL();
 					} else {
-						((EditSubTaskBox)node).subTask.setName(((EditSubTaskBox)node).subTaskNameField.getText());
+						((EditSubTaskBox)node).getSubTask().setName(((EditSubTaskBox)node).getSubTaskNameField().getText());
 					}
 				}
 			}
 			
 			//Copy changes to original task
 			this.task = new MainTask(copyTask);
+			this.task.updateSQL();
 			for (SubTask subTask : this.task.getSubTaskList()) {
 				subTask.updateSQL();
 			}
 			
 			//Update UI
+			Main.toDoPane.getTasks();
 			Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 			this.setVisible(false);
 			this.setManaged(false);
@@ -121,20 +134,20 @@ public class EditTaskBox extends VBox {
 		
 		//Time title label
 		Label taskTimeLabel = new Label("Time:");
-		taskTimeLabel.setMinWidth(70);
-		taskTimeLabel.setMaxWidth(70);
-		
+		taskTimeLabel.setMinWidth(45);
+		taskTimeLabel.setMaxWidth(45);
+
 		//Time field
 		this.taskTimeField = new RestrictedTextField("[0-9]", 4);
 		this.taskTimeField.setMinWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
 		this.taskTimeField.setMaxWidth(new Text("00:00").getLayoutBounds().getWidth() + 14);
 		HBox.setMargin(this.taskTimeField, new Insets(0, 10, 0, 0));
-		
+
 		//Date title label
 		Label taskDateLabel = new Label("Date:");
-		taskDateLabel.setMinWidth(40);
-		taskDateLabel.setMaxWidth(40);
-		
+		taskDateLabel.setMinWidth(45);
+		taskDateLabel.setMaxWidth(45);
+
 		//Previous date button
 		Button previousDateButton = new Button();
 		previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 0;");
@@ -174,7 +187,7 @@ public class EditTaskBox extends VBox {
 		nextDateButton.setOnAction(e -> {
 			this.setNewDate(this.copyTask.getPlanDate().plusDays(1));
 		});
-		
+
 		//Empty region
 		Region emptyRegion2 = new Region();
 		HBox.setHgrow(emptyRegion2, Priority.ALWAYS);
@@ -212,16 +225,33 @@ public class EditTaskBox extends VBox {
 		deleteImageView.fitWidthProperty().bind(deleteButton.widthProperty());
 		deleteButton.setGraphic(deleteImageView);
 		
-		//HBox for task time and date
-		HBox taskTimeBox = new HBox();
-		taskTimeBox.setPadding(new Insets(0,0,0,3));
-		taskTimeBox.setAlignment(Pos.CENTER_LEFT);
-		taskTimeBox.getChildren().addAll(taskTimeLabel, this.taskTimeField, taskDateLabel, previousDateButton, this.taskDateField, nextDateButton, emptyRegion2, addButton, deleteButton);
+		Button switchDateButton = new Button("S");
+		switchDateButton.setMinSize(34, 34);
+		switchDateButton.setMaxSize(34, 34);
+		switchDateButton.setOnAction(e -> {
+			this.setTaskHasDate(!this.taskHasDate);
+		});
 		
+		//HBox for task time and date
+		this.taskDateBox = new HBox();
+		this.taskDateBox.setPadding(new Insets(0,0,0,3));
+		this.taskDateBox.setAlignment(Pos.CENTER_LEFT);
+		this.taskDateBox.getChildren().addAll(taskTimeLabel, this.taskTimeField, taskDateLabel, previousDateButton, this.taskDateField, nextDateButton);
+
+		//HBox for task time and date
+		HBox taskButtonBox = new HBox();
+		taskButtonBox.setPadding(new Insets(0,0,0,3));
+		taskButtonBox.setAlignment(Pos.CENTER_LEFT);
+		taskButtonBox.getChildren().addAll(switchDateButton, addButton, deleteButton);
+
+		//Hbox for optional date and time
+		HBox taskSecondRowBox = new HBox();
+		taskSecondRowBox.getChildren().addAll(this.taskDateBox, emptyRegion2, taskButtonBox);
+
 		//VBox for subtasks
 		this.subTaskBox = new VBox();
 		this.subTaskBox.setPadding(new Insets(0,0,0,34));
-		this.getChildren().addAll(taskNameBox, taskTimeBox, this.subTaskBox);
+		this.getChildren().addAll(taskNameBox, taskSecondRowBox, this.subTaskBox);
 	}
 	
 	/**
@@ -247,23 +277,21 @@ public class EditTaskBox extends VBox {
 		} else {
 			this.taskTimeField.setText("");
 		}
-		this.setNewDate(this.copyTask.getPlanDate());
+		if (this.copyTask.getPlanDate() != null) {
+			this.setNewDate(this.copyTask.getPlanDate());
+			this.setTaskHasDate(true);
+		} else {
+			this.setNewDate(LocalDate.now());
+			this.setTaskHasDate(false);
+		}
+
 		for (SubTask subTask : this.copyTask.getSubTaskList()) {
 			this.subTaskBox.getChildren().add(new EditSubTaskBox(subTask));
 		}
-		
+
 		//Set this as visible in UI
 		this.setVisible(true);
 		this.setManaged(true);
-	}
-	
-	/**
-	 * Set PlanDate of the MainTask to the date selected in the dateLabel.
-	 * @param date
-	 */
-	public void setNewDate(LocalDate date) {
-		this.copyTask.setPlanDate(date);
-		this.taskDateField.setText(this.copyTask.getPlanDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 	}
 	
 	/**
@@ -278,6 +306,22 @@ public class EditTaskBox extends VBox {
 	}
 	
 	/**
+	 * Set PlanDate of the MainTask to the date selected in the dateLabel.
+	 * @param date
+	 */
+	public void setNewDate(LocalDate date) {
+		this.copyTask.setPlanDate(date);
+		this.taskDateField.setText(this.copyTask.getPlanDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+	}
+	
+	public void setTaskHasDate(Boolean hasDate) {
+		this.taskHasDate = hasDate;
+				
+		this.taskDateBox.setVisible(hasDate);
+		this.taskDateBox.setManaged(hasDate);
+	}
+	
+	/**
 	 * Sets TaskPane as invisible and deletes Task from SQLite database.
 	 */
 	public void delete() {
@@ -286,6 +330,7 @@ public class EditTaskBox extends VBox {
 		this.setManaged(false);
 		
 		//Update UI
+		Main.toDoPane.getTasks();
 		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
@@ -331,6 +376,18 @@ public class EditTaskBox extends VBox {
 		
 		public void setSubTaskName() {
 			this.subTask.setName(subTaskNameField.getText());
+		}
+		
+		public SubTask getSubTask() {
+			return this.subTask;
+		}
+		
+		public TextField getSubTaskNameField() {
+			return this.subTaskNameField;
+		}
+		
+		public Boolean getDeleted() {
+			return this.deleted;
 		}
 	}
 }
