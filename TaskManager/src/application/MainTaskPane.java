@@ -5,7 +5,6 @@ import java.time.format.DateTimeFormatter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,9 +43,9 @@ public class MainTaskPane extends TaskPane {
 		//Subtask expand labels for subtaskcount and expansion status on the expand button
 		Label expandLabel = new Label();
 		if (((MainTask)this.task).isExpanded()) {
-			expandLabel.setText(" ^");
+			expandLabel.setText("V");
 		} else {
-			expandLabel.setText(" V");
+			expandLabel.setText("^");
 		}
 		HBox expandButtonBox = new HBox();
 		expandButtonBox.setAlignment(Pos.CENTER_LEFT);
@@ -71,11 +70,11 @@ public class MainTaskPane extends TaskPane {
 
 		//Rebuild Hbox
 		this.taskBox.getChildren().clear();
-		this.taskBox.getChildren().addAll(this.completeCheckBox, expandButton, this.taskTimeLabel, this.taskNameLabel);
+		this.taskBox.getChildren().addAll(expandButton, this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel);
 
 		//Button to hold the HBox
 		this.taskBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
-		this.taskBox.setPadding(new Insets(0, 0, 0, 9));
+		this.taskBox.setPadding(new Insets(0, 0, 0, 0));
 		this.taskBox.setAlignment(Pos.CENTER_LEFT);
 		HBox.setHgrow(this.taskBox, Priority.ALWAYS);
 		this.taskBox.setMaxWidth(Double.MAX_VALUE);

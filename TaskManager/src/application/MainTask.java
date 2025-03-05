@@ -1,5 +1,6 @@
 package application;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		}
 		
 		//Update UI
-		Main.toDoPane.getTasks();
+		Main.toDoPane.getTasks(Main.toDoPane.getCategory());
 		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
@@ -115,7 +116,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		SQLConnector.delete("DELETE FROM subtasks WHERE MainTaskID = '" + this.getID() + "'");
 		
 		//Update UI
-		Main.toDoPane.getTasks();
+		Main.toDoPane.getTasks(Main.toDoPane.getCategory());
 		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
@@ -190,5 +191,60 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		}
 
 		return outcome;
+	}
+	
+	public static ArrayList<MainTask> getMainTaskList(LocalDate date, ReadMode readMode, Category category) {
+		//New tasklist
+		ArrayList<MainTask> taskList = new ArrayList<MainTask>();
+		
+		//Set SQLString
+		String SQLString = "SELECT * FROM tasks WHERE Date ";
+		if (date == null) {
+			SQLString += "IS null";
+		} else if (readMode == ReadMode.equals) {
+			SQLString += "= '" + date.toString() + "'";
+		} else if (readMode == ReadMode.lessThan) {
+			SQLString += "< '" + date.toString() + "'";
+		}
+		
+		if (category != null) {
+			SQLString += " AND Category = " + category.getID();
+		}
+
+		//Get tasks from database
+		SQLConnector.read(SQLString, rs -> {
+			try {
+				while (rs.next()) {
+					//Parse string result from time query to LocalTime if it's not null
+					LocalTime taskTime = null;
+					if (rs.getString("Time") != null) {
+						taskTime = LocalTime.parse(rs.getString("Time"));
+					}
+
+					//Create new main task
+					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), date, taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")));
+
+					//Get subtasks for main task
+					SQLConnector.read("SELECT * FROM subtasks WHERE MainTaskID = " + newMainTask.getID(), rsSubTask -> {
+						try {
+							while (rsSubTask.next()) {
+								//Create subtask
+								SubTask newSubTask = new SubTask(newMainTask, rsSubTask.getInt("ID"), rsSubTask.getString("Name"), Boolean.parseBoolean(rsSubTask.getString("Completed")));
+								//Add to subtasklist
+								newMainTask.addToSubTaskList(newSubTask);
+							}
+						} catch (SQLException e) {
+							System.out.println(e);
+						}
+					});
+					
+					//Add main task to tasklist
+					taskList.add(newMainTask);
+				}
+			} catch (SQLException e) {
+				System.out.println(e);
+			}
+		});
+		return taskList;
 	}
 }
