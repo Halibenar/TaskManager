@@ -57,6 +57,7 @@ public class Main extends Application {
 				  "	Name VARCHAR(100) NOT NULL," +
 				  "	Date DATE," +
 				  "	Time TEXT," +
+				  " Category INT," +
 				  "	Completed INTYINT(1) NOT NULL," +
 				  "	Expanded INTYINT(1) NOT NULL" +
 				  ");");
@@ -66,6 +67,12 @@ public class Main extends Application {
 				  "	Name VARCHAR(100) NOT NULL," +
 				  "	MainTaskID INT NOT NULL," +
 				  "	Completed INTYINT(1) NOT NULL" +
+				  ");");
+		
+		//Task category table
+		tableStrings.add("CREATE TABLE IF NOT EXISTS categories (" +
+				  "	ID INTEGER PRIMARY KEY," +
+				  "	Name VARCHAR(100) NOT NULL" +
 				  ");");
 
 		SQLConnector.checkTables(tableStrings);

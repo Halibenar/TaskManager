@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+
 import application.Main.ViewMode;
+import application.Task.ReadMode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -13,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -229,13 +233,67 @@ public class CalendarPane extends VBox {
 		}
 		
 		//Get list of overdue tasks from database, display tasklistbox if there are any
-		if (Task.getTaskList(LocalDate.now(), Task.ReadMode.overDue).size() > 0) {
-			this.daysBox.getChildren().add(Task.getTaskListBox(LocalDate.now(), Task.ReadMode.overDue));
+		ArrayList<MainTask> taskList = MainTask.getMainTaskList(LocalDate.now(), Task.ReadMode.lessThan, null);
+		if (taskList.size() > 0) {
+			//Title label
+			HBox titleBox = new HBox();
+			Label overdueLabel = new Label("OVERDUE");
+			overdueLabel.setFont(new Font(overdueLabel.getFont().getName(), 12));
+			titleBox.getChildren().add(overdueLabel);
+			
+			VBox taskListBox = new VBox();
+			taskListBox.setPadding(new Insets(0, 3, 3, 3));
+			taskListBox.setStyle("-fx-border-color: grey; -fx-border-width: 1;");
+			taskListBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+			GridPane.setHgrow(taskListBox, Priority.ALWAYS);
+			GridPane.setVgrow(taskListBox, Priority.ALWAYS);
+
+			//Labels for tasks with spacing of 3 between tasks and between following add task button
+			VBox taskBox = new VBox();
+			taskBox.setSpacing(3);
+			taskBox.setPadding(new Insets(0, 0, 3, 0));
+			
+			//Add taskPanes
+			taskList.sort(null);
+			for (MainTask task : taskList) {
+				taskBox.getChildren().add(task.taskPane);
+			}
+
+			taskListBox.getChildren().addAll(titleBox, taskBox);
+			this.daysBox.getChildren().add(taskListBox);
 		}
 		
 		//Display tasklistbox with tasks for every day
 		for (LocalDate showDate : showDates) {
-			this.daysBox.getChildren().add(Task.getTaskListBox(showDate, Task.ReadMode.forDate));
+			taskList = MainTask.getMainTaskList(showDate, ReadMode.equals, null);
+
+			//Title label
+			HBox titleBox = new HBox();
+			Label dayOfWeekLabel = new Label(showDate.getDayOfWeek().toString().substring(0,3));
+			dayOfWeekLabel.setMinWidth(40);
+			Label dateLabel = new Label(showDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+			titleBox.getChildren().addAll(dayOfWeekLabel, dateLabel);
+
+			VBox taskListBox = new VBox();
+			taskListBox.setPadding(new Insets(0, 3, 3, 3));
+			taskListBox.setStyle("-fx-border-color: grey; -fx-border-width: 1;");
+			taskListBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+			GridPane.setHgrow(taskListBox, Priority.ALWAYS);
+			GridPane.setVgrow(taskListBox, Priority.ALWAYS);
+
+			//Labels for tasks with spacing of 3 between tasks and between following add task button
+			VBox taskBox = new VBox();
+			taskBox.setSpacing(3);
+			taskBox.setPadding(new Insets(0, 0, 3, 0));
+			
+			//Add taskPanes
+			taskList.sort(null);
+			for (MainTask task : taskList) {
+				taskBox.getChildren().add(task.taskPane);
+			}
+
+			taskListBox.getChildren().addAll(titleBox, taskBox);
+			this.daysBox.getChildren().add(taskListBox);
 		}
 	}
 	
