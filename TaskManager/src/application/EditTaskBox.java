@@ -3,10 +3,15 @@ package application;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -16,6 +21,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.StringConverter;
 
 public class EditTaskBox extends VBox {
 
@@ -26,6 +32,8 @@ public class EditTaskBox extends VBox {
 	private RestrictedTextField taskTimeField;
 	private RestrictedTextField taskDateField;
 	private HBox taskDateBox;
+	private HBox taskCategoryBox;
+	ComboBox<Category> categoryComboBox;
 	private VBox subTaskBox;
 
 	private Boolean taskHasDate;
@@ -85,6 +93,9 @@ public class EditTaskBox extends VBox {
 				//Set date
 				this.copyTask.setPlanDate(null);
 			}
+			
+			//Set category
+			this.copyTask.setCategory(this.categoryComboBox.getValue());
 			
 			//Set SubTask names and remove deleted SubTasks
 			for (Node node : this.subTaskBox.getChildren()) {
@@ -159,7 +170,7 @@ public class EditTaskBox extends VBox {
 			this.setNewDate(this.copyTask.getPlanDate().minusDays(1));
 		});
 
-		//Date label
+		//Date field
 		this.taskDateField = new RestrictedTextField("([0-9]|-)", 10);
 		this.taskDateField.setMinWidth(new Text("00-00-0000").getLayoutBounds().getWidth() + 14);
 		this.taskDateField.setMaxWidth(new Text("00-00-0000").getLayoutBounds().getWidth() + 14);
@@ -234,6 +245,44 @@ public class EditTaskBox extends VBox {
 		this.taskDateBox.setPadding(new Insets(0,0,0,3));
 		this.taskDateBox.setAlignment(Pos.CENTER_LEFT);
 		this.taskDateBox.getChildren().addAll(taskTimeLabel, this.taskTimeField, taskDateLabel, previousDateButton, this.taskDateField, nextDateButton);
+		
+		//Category label
+		Label taskCategoryLabel = new Label("List:");
+		taskCategoryLabel.setMinWidth(45);
+		taskCategoryLabel.setMaxWidth(45);
+		
+		//Category selection list
+		ObservableList<Category> categoryList = FXCollections.observableList(Category.getCategoryList());
+
+		this.categoryComboBox = new ComboBox<>();
+		this.categoryComboBox.setItems(categoryList);
+
+		this.categoryComboBox.setConverter(new StringConverter<Category>() {
+
+			@Override
+			public String toString(Category object) {
+				if (object != null) {
+					return object.getName();
+				} else {
+					return "None";
+				}
+			}
+
+			@Override
+			public Category fromString(String string) {
+				return categoryComboBox.getItems().stream().filter(ap -> 
+				ap.getName().equals(string)).findFirst().orElse(null);
+			}
+		});
+
+		//categoryBox.setEditable(true);
+		this.categoryComboBox.setVisibleRowCount(3);
+
+		//HBox for task category
+		this.taskCategoryBox = new HBox();
+		this.taskCategoryBox.setPadding(new Insets(0,0,0,3));
+		this.taskCategoryBox.setAlignment(Pos.CENTER_LEFT);
+		this.taskCategoryBox.getChildren().addAll(taskCategoryLabel, this.categoryComboBox);
 
 		//HBox for task time and date
 		HBox taskButtonBox = new HBox();
@@ -243,7 +292,7 @@ public class EditTaskBox extends VBox {
 
 		//Hbox for optional date and time
 		HBox taskSecondRowBox = new HBox();
-		taskSecondRowBox.getChildren().addAll(this.taskDateBox, emptyRegion2, taskButtonBox);
+		taskSecondRowBox.getChildren().addAll(this.taskDateBox, this.taskCategoryBox, emptyRegion2, taskButtonBox);
 
 		//VBox for subtasks
 		this.subTaskBox = new VBox();
@@ -276,11 +325,18 @@ public class EditTaskBox extends VBox {
 		}
 		if (this.copyTask.getPlanDate() != null) {
 			this.setNewDate(this.copyTask.getPlanDate());
+			this.categoryComboBox.setValue(null);
 			this.setTaskHasDate(true);
 		} else {
 			this.setNewDate(LocalDate.now());
 			this.setTaskHasDate(false);
 		}
+		
+		AtomicInteger categoryID = new AtomicInteger(0);
+		if (this.copyTask.getCategory() != null ) {
+			categoryID.set(this.copyTask.getCategory().getID());
+		}
+		Category.getCategoryList().stream().filter(c -> c.getID() == categoryID.get()).forEach(Category -> { this.categoryComboBox.setValue(Category); });
 
 		for (SubTask subTask : this.copyTask.getSubTaskList()) {
 			this.subTaskBox.getChildren().add(new EditSubTaskBox(subTask));
@@ -316,6 +372,9 @@ public class EditTaskBox extends VBox {
 				
 		this.taskDateBox.setVisible(hasDate);
 		this.taskDateBox.setManaged(hasDate);
+		
+		this.taskCategoryBox.setVisible(!hasDate);
+		this.taskCategoryBox.setManaged(!hasDate);
 	}
 	
 	/**

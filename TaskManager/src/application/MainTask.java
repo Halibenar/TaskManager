@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Extends Task. Class describing a main task in the agenda. Holds a list of subTasks.
@@ -12,9 +13,10 @@ import java.util.ArrayList;
  */
 public class MainTask extends Task implements Comparable<MainTask> {
 
-	private LocalDate planDate;
+	private LocalDate date;
 	private LocalTime time;
 	private Boolean expanded;
+	private Category category;
 
 	private ArrayList<SubTask> subTaskList = new ArrayList<SubTask>();
 
@@ -22,11 +24,12 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	 * Constructor for new MainTask on a PlanDate.
 	 * @param planDate Date the task should be planned on
 	 */
-	public MainTask(LocalDate planDate) {
+	public MainTask(LocalDate date) {
 		this.iD = 0;
 		this.name = "";
-		this.planDate = planDate;
+		this.date = date;
 		this.time = null;
+		this.category = null;
 		this.completed = false;
 		this.expanded = false;
 		this.taskPane = new MainTaskPane(this);
@@ -42,14 +45,13 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	 * @param expanded MainTaskPane expanded
 	 * @param editMode MainTaskPane editMode
 	 */
-	public MainTask(int iD, String name, LocalDate planDate, LocalTime time, Boolean completed, Boolean expanded) {
+	public MainTask(int iD, String name, LocalDate date, LocalTime time, Boolean completed, Boolean expanded) {
 		this.iD = iD;
 		this.name = name;
-		this.planDate = planDate;
+		this.date = date;
 		this.time = time;
 		this.completed = completed;
 		this.expanded = expanded;
-		this.taskPane = new MainTaskPane(this);
 	}
 	
 	/*
@@ -59,8 +61,9 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public MainTask(MainTask another) {
 		this.iD = another.iD;
 		this.name = another.name;
-		this.planDate = another.planDate;
+		this.date = another.date;
 		this.time = another.time;
+		this.category = another.category;
 		this.completed = another.completed;
 		this.expanded = another.expanded;
 		this.taskPane = another.taskPane;
@@ -79,7 +82,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public void updateSQL() {
 		
 		//Get data to insert
-		String[] data = new String[5];
+		String[] data = new String[6];
 		data[0] = this.getName();
 		data[1] = null;
 		if (this.getPlanDate() != null) {
@@ -89,17 +92,21 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		if (this.getTime() != null) {
 			data[2] = this.getTime().toString().substring(0,5);
 		}
-		data[3] = this.isCompleted().toString();
-		data[4] = this.isExpanded().toString();
+		data[3] = Integer.toString(0);
+		if (this.getCategory() != null) {
+			data[3] = Integer.toString(this.getCategory().getID());
+		}
+		data[4] = this.isCompleted().toString();
+		data[5] = this.isExpanded().toString();
 
 		//If new task, add to database
 		if (this.getID() == 0) {
-			String insertString = "INSERT INTO tasks (Name, Date, Time, Completed, Expanded) VALUES (?,?,?,?,?)";
+			String insertString = "INSERT INTO tasks (Name, Date, Time, Category, Completed, Expanded) VALUES (?,?,?,?,?,?)";
 			this.setID(SQLConnector.insert(insertString, data));
 
 		//If already exists, update records
 		} else {
-			String updateString = "UPDATE tasks SET Name = ?, Date = ?, Time = ?, Completed = ?, Expanded = ? WHERE ID = " + this.getID();
+			String updateString = "UPDATE tasks SET Name = ?, Date = ?, Time = ?, Category = ?, Completed = ?, Expanded = ? WHERE ID = " + this.getID();
 			SQLConnector.update(updateString, data);
 		}
 		
@@ -121,11 +128,11 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	}
 	
 	public LocalDate getPlanDate() {
-		return planDate;
+		return date;
 	}
 
 	public void setPlanDate(LocalDate planDate) {
-		this.planDate = planDate;
+		this.date = planDate;
 	}
 
 	public LocalTime getTime() {
@@ -135,6 +142,14 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public void setTime(LocalTime time) {
 		this.time = time;
 		((MainTaskPane)this.taskPane).setTime(time);
+	}
+	
+	public Category getCategory() {
+		return this.category;
+	}
+	
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 	
 	public Boolean isExpanded() {
@@ -224,6 +239,19 @@ public class MainTask extends Task implements Comparable<MainTask> {
 					//Create new main task
 					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), date, taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")));
 
+					//Get category for main task; default is zero ("To Do"), but replaced if database contains a category matching tasks category
+					AtomicInteger categoryID = new AtomicInteger(0);
+					SQLConnector.read("SELECT * FROM categories WHERE ID = " + rs.getInt("Category"), rsCategory -> {
+						try {
+							while (rsCategory.next()) {
+								categoryID.set(rsCategory.getInt("ID"));
+							}
+						} catch (SQLException e) {
+							System.out.println(e);
+						}
+					});
+					Category.getCategoryList().stream().filter(c -> c.getID() == categoryID.get()).forEach(Category -> { newMainTask.setCategory(Category); });
+
 					//Get subtasks for main task
 					SQLConnector.read("SELECT * FROM subtasks WHERE MainTaskID = " + newMainTask.getID(), rsSubTask -> {
 						try {
@@ -237,6 +265,8 @@ public class MainTask extends Task implements Comparable<MainTask> {
 							System.out.println(e);
 						}
 					});
+					//Create TaskPane
+					newMainTask.taskPane = new MainTaskPane(newMainTask);
 					
 					//Add main task to tasklist
 					taskList.add(newMainTask);

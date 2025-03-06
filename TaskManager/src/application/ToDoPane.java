@@ -45,17 +45,16 @@ public class ToDoPane extends VBox {
 		addTaskButton.setGraphic(addImageView);
 		addTaskButton.setOnAction(e -> {
 			MainTask newTask = new MainTask((LocalDate)null);
+			newTask.setCategory(this.category);
 			this.editTaskBox.setTask(newTask);
 		});
 		
 		//Category selection list
-		ObservableList<Category> categoryList = FXCollections.observableList(Category.getCategoryList());
-		categoryList.add(null);
-		categoryList.sort(null);
+		ObservableList<Category> categoryList = FXCollections.observableList(FXCollections.observableList(Category.getCategoryList()));
+		categoryList.add(new Category(-1, "All"));
 		
 		ComboBox<Category> categoryBox = new ComboBox<>();
 		categoryBox.setItems(categoryList);
-
 		categoryBox.setConverter(new StringConverter<Category>() {
 
 			@Override
@@ -73,11 +72,12 @@ public class ToDoPane extends VBox {
 				ap.getName().equals(string)).findFirst().orElse(null);
 			}
 		});
+		categoryBox.setValue(Category.getCategoryList().get(0));
 		
 		//categoryBox.setEditable(true);
 		categoryBox.setVisibleRowCount(3);
 		categoryBox.setOnAction(e -> {
-			this.getTasks(categoryBox.getSelectionModel().getSelectedItem());
+			this.getTasks(categoryBox.getValue());
 		});
 		
 		controlBar.getChildren().addAll(addTaskButton, categoryBox);
@@ -102,44 +102,65 @@ public class ToDoPane extends VBox {
 		this.editTaskBox.setManaged(false);
 		
 		this.getChildren().addAll(controlBar, scrollPane, this.editTaskBox);
-		this.getTasks(null);
+		Category.getCategoryList().stream().filter(c -> c.getID() == 0).forEach(Category -> { this.category = Category; });
+		
+		//Clear
+		this.daysBox.getChildren().clear();
+		this.getTasks(this.category);
 	}
 
 	public void getTasks(Category category) {
 		this.category = category;
 		
-		//Clear
+		ArrayList<Category> categoryDisplayList = new ArrayList<Category>();
+		
 		this.daysBox.getChildren().clear();
-		
-		//Get tasks
-		ArrayList<MainTask> taskList = MainTask.getMainTaskList(null, Task.ReadMode.equals, category);
 
-		//Title label
-		HBox titleBox = new HBox();
-		Label toDoLabel = new Label("TO DO");
-		toDoLabel.setFont(new Font(toDoLabel.getFont().getName(), 12));
-		titleBox.getChildren().add(toDoLabel);
-
-		VBox taskListBox = new VBox();
-		taskListBox.setPadding(new Insets(0, 3, 3, 3));
-		taskListBox.setStyle("-fx-border-color: grey; -fx-border-width: 1;");
-		taskListBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		GridPane.setHgrow(taskListBox, Priority.ALWAYS);
-		GridPane.setVgrow(taskListBox, Priority.ALWAYS);
-
-		//Labels for tasks with spacing of 3 between tasks and between following add task button
-		VBox taskBox = new VBox();
-		taskBox.setSpacing(3);
-		taskBox.setPadding(new Insets(0, 0, 3, 0));
-		
-		//Add taskPanes
-		taskList.sort(null);
-		for (MainTask task : taskList) {
-			taskBox.getChildren().add(task.taskPane);
+		if (this.category.getID() < 0) {
+			for (Category displayCategory : Category.getCategoryList()) {
+				if (displayCategory.getID() >= 0) {
+					categoryDisplayList.add(displayCategory);
+				}
+			}
+		} else {
+			categoryDisplayList.add(this.category);
 		}
 
-		taskListBox.getChildren().addAll(titleBox, taskBox);
-		this.daysBox.getChildren().add(taskListBox);
+		for (Category displayCategory : categoryDisplayList) {
+			//Get tasks
+			ArrayList<MainTask> taskList = MainTask.getMainTaskList(null, Task.ReadMode.equals, displayCategory);
+
+			//Title label
+			HBox titleBox = new HBox();
+			String titleLabelString = "To Do";
+			if (displayCategory != null) {
+				titleLabelString = displayCategory.getName();
+			}
+			Label toDoLabel = new Label(titleLabelString);
+			toDoLabel.setFont(new Font(toDoLabel.getFont().getName(), 12));
+			titleBox.getChildren().add(toDoLabel);
+
+			VBox taskListBox = new VBox();
+			taskListBox.setPadding(new Insets(0, 3, 3, 3));
+			taskListBox.setStyle("-fx-border-color: grey; -fx-border-width: 1;");
+			taskListBox.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+			GridPane.setHgrow(taskListBox, Priority.ALWAYS);
+			GridPane.setVgrow(taskListBox, Priority.ALWAYS);
+
+			//Labels for tasks with spacing of 3 between tasks and between following add task button
+			VBox taskBox = new VBox();
+			taskBox.setSpacing(3);
+			taskBox.setPadding(new Insets(0, 0, 3, 0));
+
+			//Add taskPanes
+			taskList.sort(null);
+			for (MainTask task : taskList) {
+				taskBox.getChildren().add(task.taskPane);
+			}
+			taskListBox.getChildren().addAll(titleBox, taskBox);
+
+			this.daysBox.getChildren().add(taskListBox);
+		}
 	}
 	
 	public Category getCategory() {
