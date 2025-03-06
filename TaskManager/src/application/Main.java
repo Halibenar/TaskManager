@@ -78,6 +78,7 @@ public class Main extends Application {
 		SQLConnector.checkTables(tableStrings);
 		
 		//Create panes and menubar
+		Category.updateCategoryList();
 		Main.calendarPane = new CalendarPane();
 		Main.calendarPane.setPlanDate(LocalDate.now());
 		Main.toDoPane = new ToDoPane();

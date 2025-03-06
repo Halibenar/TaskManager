@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Category implements Comparable<Category> {
 
+	private static ArrayList<Category> categoryList;
 	private int iD;
 	private String name;
 	
@@ -41,16 +42,18 @@ public class Category implements Comparable<Category> {
 	
 	@Override
 	public int compareTo(Category another) {
-		if (another == null) {
+		if (this.getID() == 0) {
+			return -1;
+		} else if (another.getID() == 0) {
 			return 1;
 		} else {
 			return this.name.compareTo(another.name);
 		}
 	}
 	
-	public static ArrayList<Category> getCategoryList() {
+	public static void updateCategoryList() {
 		//New tasklist
-		ArrayList<Category> categoryList = new ArrayList<Category>();
+		categoryList = new ArrayList<Category>();
 		
 		//Set SQLString
 		String SQLString = "SELECT * FROM categories";
@@ -70,6 +73,15 @@ public class Category implements Comparable<Category> {
 				System.out.println(e);
 			}
 		});
+		
+		//Add category for all
+		categoryList.add(new Category(0, "Uncategorised"));
+		
+		//Sort list
+		categoryList.sort(null);
+	}
+	
+	public static ArrayList<Category> getCategoryList() {
 		return categoryList;
 	}
 
