@@ -40,12 +40,30 @@ public class Category implements Comparable<Category> {
 		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 	
+	/**
+	 * Delete SQLite database entry of this MainTask and all its SubTasks
+	 */
+	public void deleteSQL() {
+		String[] data = new String[1];
+		data[0] = Integer.toString(0);
+		String updateString = "UPDATE tasks SET Category = ? WHERE Category = " + this.getID();
+		SQLConnector.update(updateString, data);
+		
+		SQLConnector.delete("DELETE FROM categories WHERE ID = '" + this.getID() + "'");
+		
+		//Update UI
+		Main.toDoPane.getTasks(Main.toDoPane.getCategory());
+		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
+	}
+	
 	@Override
 	public int compareTo(Category another) {
-		if (this.getID() == 0) {
-			return -1;
-		} else if (another.getID() == 0) {
-			return 1;
+		if (this.getID() <= 0 || another.getID() <= 0) {
+			if (this.getID() < another.getID()) {
+				return -1;
+			} else {
+				return 1;
+			}
 		} else {
 			return this.name.compareTo(another.name);
 		}
