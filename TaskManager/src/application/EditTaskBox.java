@@ -3,6 +3,7 @@ package application;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.collections.FXCollections;
@@ -251,12 +252,7 @@ public class EditTaskBox extends VBox {
 		taskCategoryLabel.setMinWidth(45);
 		taskCategoryLabel.setMaxWidth(45);
 		
-		//Category selection list
-		ObservableList<Category> categoryList = FXCollections.observableList(Category.getCategoryList());
-
 		this.categoryComboBox = new ComboBox<>();
-		this.categoryComboBox.setItems(categoryList);
-
 		this.categoryComboBox.setConverter(new StringConverter<Category>() {
 
 			@Override
@@ -275,8 +271,9 @@ public class EditTaskBox extends VBox {
 			}
 		});
 
-		//categoryBox.setEditable(true);
 		this.categoryComboBox.setVisibleRowCount(3);
+		//Set category selection list
+		this.setPickList();
 
 		//HBox for task category
 		this.taskCategoryBox = new HBox();
@@ -375,6 +372,16 @@ public class EditTaskBox extends VBox {
 		
 		this.taskCategoryBox.setVisible(!hasDate);
 		this.taskCategoryBox.setManaged(!hasDate);
+	}
+	
+	public void setPickList() {
+		ArrayList<Category> pickList = new ArrayList<Category>();
+		for (Category category : Category.getCategoryList()) {
+			if (category.getID() >= 0) {
+				pickList.add(category);
+			}
+		}
+		this.categoryComboBox.setItems(FXCollections.observableList(pickList));
 	}
 	
 	/**

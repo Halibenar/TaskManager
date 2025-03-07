@@ -250,7 +250,13 @@ public class MainTask extends Task implements Comparable<MainTask> {
 							System.out.println(e);
 						}
 					});
-					Category.getCategoryList().stream().filter(c -> c.getID() == categoryID.get()).forEach(Category -> { newMainTask.setCategory(Category); });
+					for (Category taskCategory : Category.getCategoryList()) {
+						if (taskCategory != null) {
+							if (taskCategory.getID() == categoryID.get()) {
+								newMainTask.setCategory(taskCategory);
+							}
+						}
+					}
 
 					//Get subtasks for main task
 					SQLConnector.read("SELECT * FROM subtasks WHERE MainTaskID = " + newMainTask.getID(), rsSubTask -> {
