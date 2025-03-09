@@ -4,14 +4,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.Node;
 
 /**
  * Extends TaskPane. Belongs to a MainTask. Displays MainTask name, time and completion and allows it to be edited and deleted.
@@ -23,9 +21,9 @@ public class MainTaskPane extends TaskPane {
 	private VBox subTaskBox = new VBox();
 	private HBox buttonBox = new HBox();
 	private Label subTaskCountLabel = new Label();
-	private Button expandButton = new Button();
 	private Label taskTimeLabel = new Label();
-	private Button editButton = new Button();
+	private TaskButton expandButton;
+	private TaskButton editButton;
 
 	/**
 	 * Creates MainTaskPane to display information on a MainTask.
@@ -52,9 +50,7 @@ public class MainTaskPane extends TaskPane {
 		expandButtonBox.getChildren().addAll(this.subTaskCountLabel, expandLabel);
 
 		//Subtask expand button, only visible if subtasks are added in addSubTaskPanes
-		this.expandButton.setMinSize(34, 34);
-		this.expandButton.setMaxSize(34, 34);
-		this.expandButton.setGraphic(expandButtonBox);
+		this.expandButton = new TaskButton(((Node)expandButtonBox));
 		this.expandButton.setOnAction(e -> {
 			if (((MainTask)this.task).getSubTaskList().size() > 0) {
 				((MainTask)this.task).setExpanded(!((MainTask)this.task).isExpanded());
@@ -82,13 +78,7 @@ public class MainTaskPane extends TaskPane {
 		this.taskBox.setMaxHeight(34);
 		
 		//Edit button opens editTaskPane for this task
-		this.editButton.setMinSize(34, 34);
-		this.editButton.setMaxSize(34, 34);
-		Image editImage = new Image(getClass().getResourceAsStream("/icons/ButtonEdit.png"), 34, 34, true, true);
-		ImageView editImageView = new ImageView(editImage);
-		editImageView.fitHeightProperty().bind(this.editButton.heightProperty());
-		editImageView.fitWidthProperty().bind(this.editButton.widthProperty());
-		this.editButton.setGraphic(editImageView);
+		this.editButton = new TaskButton("/icons/ButtonEdit.png");
 		this.editButton.setOnAction(e -> {
 			if (((MainTask)this.task).getPlanDate() != null) {
 				Main.calendarPane.editTaskBox.setTask((MainTask)this.task);
