@@ -61,15 +61,7 @@ public class EditTaskBox extends VBox {
 		HBox.setMargin(this.taskNameField, new Insets(0, 3, 0, 0));
 		
 		//Confirm button confirms editing
-		Button confirmButton = new Button();
-		//confirmButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 1;");
-		confirmButton.setMinSize(34, 34);
-		confirmButton.setMaxSize(34, 34);
-		Image confirmImage = new Image(getClass().getResourceAsStream("/icons/ButtonConfirm.png"), 34, 34, true, true);
-		ImageView confirmImageView = new ImageView(confirmImage);
-		confirmImageView.fitHeightProperty().bind(confirmButton.heightProperty());
-		confirmImageView.fitWidthProperty().bind(confirmButton.widthProperty());
-		confirmButton.setGraphic(confirmImageView);
+		Button confirmButton = new TaskButton("/icons/ButtonConfirm.png");
 		confirmButton.setOnAction(e -> {
 
 			//Set name
@@ -121,15 +113,7 @@ public class EditTaskBox extends VBox {
 		});
 		
 		//Cancel button cancels editing
-		Button cancelButton = new Button();
-		//cancelButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 1;");
-		cancelButton.setMinSize(34, 34);
-		cancelButton.setMaxSize(34, 34);
-		Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonCancel.png"), 34, 34, true, true);
-		ImageView cancelImageView = new ImageView(cancelImage);
-		cancelImageView.fitHeightProperty().bind(cancelButton.heightProperty());
-		cancelImageView.fitWidthProperty().bind(cancelButton.widthProperty());
-		cancelButton.setGraphic(cancelImageView);
+		Button cancelButton = new TaskButton("/icons/ButtonCancel.png");
 		cancelButton.setOnAction(e -> {
 			this.setVisible(false);
 			this.setManaged(false);
@@ -158,15 +142,7 @@ public class EditTaskBox extends VBox {
 		taskDateLabel.setMaxWidth(45);
 
 		//Previous date button
-		Button previousDateButton = new Button();
-		previousDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 0;");
-		previousDateButton.setMinSize(34, 34);
-		previousDateButton.setMaxSize(34, 34);
-		Image previousImage = new Image(getClass().getResourceAsStream("/icons/ButtonPrevious.png"), 34, 34, true, true);
-		ImageView previousImageView = new ImageView(previousImage);
-		previousImageView.fitHeightProperty().bind(previousDateButton.heightProperty());
-		previousImageView.fitWidthProperty().bind(previousDateButton.widthProperty());
-		previousDateButton.setGraphic(previousImageView);
+		Button previousDateButton = new TaskButton("/icons/ButtonPrevious.png");
 		previousDateButton.setOnAction(e -> {
 			this.setNewDate(this.copyTask.getPlanDate().minusDays(1));
 		});
@@ -184,15 +160,7 @@ public class EditTaskBox extends VBox {
 		});
 
 		//Next date button
-		Button nextDateButton = new Button();
-		nextDateButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 0;");
-		nextDateButton.setMinSize(34, 34);
-		nextDateButton.setMaxSize(34, 34);
-		Image nextImage = new Image(getClass().getResourceAsStream("/icons/ButtonNext.png"), 34, 34, true, true);
-		ImageView nextImageView = new ImageView(nextImage);
-		nextImageView.fitHeightProperty().bind(nextDateButton.heightProperty());
-		nextImageView.fitWidthProperty().bind(nextDateButton.widthProperty());
-		nextDateButton.setGraphic(nextImageView);
+		Button nextDateButton = new TaskButton("/icons/ButtonNext.png");
 		nextDateButton.setOnAction(e -> {
 			this.setNewDate(this.copyTask.getPlanDate().plusDays(1));
 		});
@@ -203,15 +171,7 @@ public class EditTaskBox extends VBox {
 		emptyRegion2.setMaxWidth(Double.MAX_VALUE);
 		
 		//Add button adds new subtask
-		Button addButton = new Button();
-		//addButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 0 1;");
-		addButton.setMinSize(34, 34);
-		addButton.setMaxSize(34, 34);
-		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonPlus.png"), 34, 34, true, true);
-		ImageView addImageView = new ImageView(addImage);
-		addImageView.fitHeightProperty().bind(addButton.heightProperty());
-		addImageView.fitWidthProperty().bind(addButton.widthProperty());
-		addButton.setGraphic(addImageView);
+		Button addButton = new TaskButton("/icons/ButtonPlus.png");
 		addButton.setOnAction(e -> {
 			if (this.subTaskBox.getChildren().size() < 10) {
 			SubTask newTask = new SubTask(this.copyTask);
@@ -221,18 +181,10 @@ public class EditTaskBox extends VBox {
 		});
 		
 		//Delete button deletes maintask
-		Button deleteButton = new Button();
-		//deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 0 1;");
-		deleteButton.setMinSize(34, 34);
-		deleteButton.setMaxSize(34, 34);
+		Button deleteButton = new TaskButton("/icons/ButtonDelete.png");
 		deleteButton.setOnAction(e -> {
 			this.delete();
 		});
-		Image deleteImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"), 34, 34, true, true);
-		ImageView deleteImageView = new ImageView(deleteImage);
-		deleteImageView.fitHeightProperty().bind(deleteButton.heightProperty());
-		deleteImageView.fitWidthProperty().bind(deleteButton.widthProperty());
-		deleteButton.setGraphic(deleteImageView);
 		
 		Button switchDateButton = new Button("S");
 		switchDateButton.setMinSize(34, 34);
@@ -414,21 +366,13 @@ public class EditTaskBox extends VBox {
 			subTaskNameField.setMaxWidth(Double.MAX_VALUE);
 			
 			//Delete button deletes subtask
-			Button deleteButton = new Button();
-			//deleteButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 0 0 1;");
-			deleteButton.setMinSize(34, 33);
-			deleteButton.setMaxSize(34, 33);
+			Button deleteButton = new TaskButton("/icons/ButtonDelete.png");
 			deleteButton.setOnAction(e -> {
 				this.subTask.getMainTask().removeFromSubTaskList(this.subTask);
 				this.deleted = true;
 				this.setVisible(false);
 				this.setManaged(false);
 			});
-			Image cancelImage = new Image(getClass().getResourceAsStream("/icons/ButtonDelete.png"), 34, 34, true, true);
-			ImageView cancelImageView = new ImageView(cancelImage);
-			cancelImageView.fitHeightProperty().bind(deleteButton.heightProperty());
-			cancelImageView.fitWidthProperty().bind(deleteButton.widthProperty());
-			deleteButton.setGraphic(cancelImageView);
 			
 			this.getChildren().addAll(subTaskNameLabel, subTaskNameField, deleteButton);
 		}

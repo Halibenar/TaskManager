@@ -17,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.StringConverter;
@@ -39,15 +40,7 @@ public class ToDoPane extends VBox {
 		controlBar.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
 		
 		//Add task button
-		Button addTaskButton = new Button();
-		addTaskButton.setMinSize(34, 34);
-		addTaskButton.setMaxSize(34, 34);
-		addTaskButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
-		ImageView addImageView = new ImageView(addImage);
-		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
-		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
-		addTaskButton.setGraphic(addImageView);
+		Button addTaskButton = new TaskButton("/icons/ButtonNew.png");
 		addTaskButton.setOnAction(e -> {
 			MainTask newTask = new MainTask((LocalDate)null);
 			newTask.setCategory(this.category);
@@ -58,7 +51,7 @@ public class ToDoPane extends VBox {
 		Button addCategoryButton = new Button("A");
 		addCategoryButton.setMinSize(34, 34);
 		addCategoryButton.setMaxSize(34, 34);
-		addCategoryButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
+		addCategoryButton.setStyle("-fx-border-color: grey; -fx-border-width: 0;");
 //		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
 //		ImageView addImageView = new ImageView(addImage);
 //		addImageView.fitHeightProperty().bind(addCategoryButton.heightProperty());
@@ -71,7 +64,10 @@ public class ToDoPane extends VBox {
 		//HBox for category selection
 		this.pickBox = new HBox();
 		this.pickBox.setAlignment(Pos.CENTER_LEFT);
-		this.pickBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
+		
+		//Category title label
+		Label categoryTitleLabel = new Label("View list:");
+		HBox.setMargin(categoryTitleLabel, new Insets(0,10,0,0));
 		
 		//Category selection box
 		ObservableList<Category> categoryList = FXCollections.observableList(Category.getCategoryList());
@@ -79,6 +75,8 @@ public class ToDoPane extends VBox {
 		categoryList.add(this.category);
 		categoryList.sort(null);
 		ComboBox<Category> categoryBox = new ComboBox<>();
+		categoryBox.setMinWidth(150);
+		categoryBox.setMaxWidth(150);
 		categoryBox.setItems(categoryList);
 		categoryBox.setConverter(new StringConverter<Category>() {
 
@@ -115,15 +113,7 @@ public class ToDoPane extends VBox {
 		});
 		
 		//Delete category button
-		this.deleteCategoryButton = new Button("D");
-		this.deleteCategoryButton.setMinSize(34, 34);
-		this.deleteCategoryButton.setMaxSize(34, 34);
-		this.deleteCategoryButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-//		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
-//		ImageView addImageView = new ImageView(addImage);
-//		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
-//		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
-//		addTaskButton.setGraphic(addImageView);
+		this.deleteCategoryButton = new TaskButton("/icons/ButtonDelete.png");
 		this.deleteCategoryButton.setOnAction(e -> {
 			if (categoryBox.getValue() != null) {
 				if (categoryBox.getValue().getID() > 0) {
@@ -137,26 +127,23 @@ public class ToDoPane extends VBox {
 		});
 		this.deleteCategoryButton.setDisable(true);
 		
-		this.pickBox.getChildren().addAll(categoryBox, this.deleteCategoryButton);
+		this.pickBox.getChildren().addAll(categoryTitleLabel, categoryBox, this.deleteCategoryButton);
 		
 		//HBox for new category
 		this.addBox = new HBox();
 		this.addBox.setAlignment(Pos.CENTER_LEFT);
-		this.addBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 0 1 0;");
+		
+		//Category add label
+		Label addCategoryTitleLabel = new Label("New list:");
+		HBox.setMargin(addCategoryTitleLabel, new Insets(0,10,0,0));
 		
 		//Add category textfield
 		TextField addCategoryField = new TextField();
+		addCategoryField.setMinWidth(150);
+		addCategoryField.setMaxWidth(150);
 		
 		//Confirm add category button
-		Button confirmCategoryButton = new Button("Y");
-		confirmCategoryButton.setMinSize(34, 34);
-		confirmCategoryButton.setMaxSize(34, 34);
-		confirmCategoryButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-//		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
-//		ImageView addImageView = new ImageView(addImage);
-//		addImageView.fitHeightProperty().bind(confirmCategoryButton.heightProperty());
-//		addImageView.fitWidthProperty().bind(confirmCategoryButton.widthProperty());
-//		confirmCategoryButton.setGraphic(addImageView);
+		Button confirmCategoryButton = new TaskButton("/icons/ButtonConfirm.png");
 		confirmCategoryButton.setOnAction(e -> {
 			this.category = new Category (addCategoryField.getText());
 			this.category.updateSQL();
@@ -168,24 +155,14 @@ public class ToDoPane extends VBox {
 			this.setAddMode(false);
 		});
 		
-		//Cancel add category button
-		Button cancelCategoryButton = new Button("N");
-		cancelCategoryButton.setMinSize(34, 34);
-		cancelCategoryButton.setMaxSize(34, 34);
-		cancelCategoryButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-//		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
-//		ImageView addImageView = new ImageView(addImage);
-//		addImageView.fitHeightProperty().bind(cancelCategoryButton.heightProperty());
-//		addImageView.fitWidthProperty().bind(cancelCategoryButton.widthProperty());
-//		cancelCategoryButton.setGraphic(addImageView);
-		cancelCategoryButton.setOnAction(e -> {
-			addCategoryField.setText("");
-			this.setAddMode(false);
-		});
+		this.addBox.getChildren().addAll(addCategoryTitleLabel, addCategoryField, confirmCategoryButton);
 		
-		this.addBox.getChildren().addAll(addCategoryField, confirmCategoryButton, cancelCategoryButton);
+		//Empty region
+		Region r1 = new Region();
+		r1.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(r1, Priority.ALWAYS);
 		
-		controlBar.getChildren().addAll(addTaskButton, addCategoryButton, this.pickBox, this.addBox);
+		controlBar.getChildren().addAll(addTaskButton, addCategoryButton, r1, this.pickBox, this.addBox);
 		this.setAddMode(false);
 
 		//VBox with tasks for each day

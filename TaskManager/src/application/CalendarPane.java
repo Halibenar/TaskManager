@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-
 import application.Main.ViewMode;
 import application.Task.ReadMode;
 import javafx.geometry.Insets;
@@ -14,8 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -72,44 +69,20 @@ public class CalendarPane extends VBox {
 		this.getChildren().addAll(controlBar, dateBar, dayButtonBar, dateStack, this.editTaskBox);
 		
 		//Add task button
-		Button addTaskButton = new Button();
-		addTaskButton.setMinSize(34, 34);
-		addTaskButton.setMaxSize(34, 34);
-		addTaskButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
-		ImageView addImageView = new ImageView(addImage);
-		addImageView.fitHeightProperty().bind(addTaskButton.heightProperty());
-		addImageView.fitWidthProperty().bind(addTaskButton.widthProperty());
-		addTaskButton.setGraphic(addImageView);
+		Button addTaskButton = new TaskButton("/icons/ButtonNew.png");
 		addTaskButton.setOnAction(e -> {
 			MainTask newTask = new MainTask(this.getPlanDate());
 			this.editTaskBox.setTask(newTask);
 		});
 		
 		//Today button
-		Button todayButton = new Button();
-		todayButton.setMinSize(34, 34);
-		todayButton.setMaxSize(34, 34);
-		todayButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-		Image todayImage = new Image(getClass().getResourceAsStream("/icons/ButtonToday.png"), 34, 34, true, true);
-		ImageView todayImageView = new ImageView(todayImage);
-		todayImageView.fitHeightProperty().bind(todayButton.heightProperty());
-		todayImageView.fitWidthProperty().bind(todayButton.widthProperty());
-		todayButton.setGraphic(todayImageView);
+		Button todayButton = new TaskButton("/icons/ButtonToday.png");
 		todayButton.setOnAction(e -> {
 			this.setPlanDate(LocalDate.now());
 		});
 		
 		//Datepicker button, sets datePicker as visible in dateStack
-		Button datePickerButton = new Button();
-		datePickerButton.setMinSize(34, 34);
-		datePickerButton.setMaxSize(34, 34);
-		datePickerButton.setStyle("-fx-border-color: grey; -fx-border-width: 1 1 0 0;");
-		Image pickerImage = new Image(getClass().getResourceAsStream("/icons/ButtonPicker.png"), 34, 34, true, true);
-		ImageView pickerImageView = new ImageView(pickerImage);
-		pickerImageView.fitHeightProperty().bind(datePickerButton.heightProperty());
-		pickerImageView.fitWidthProperty().bind(datePickerButton.widthProperty());
-		datePickerButton.setGraphic(pickerImageView);
+		Button datePickerButton = new TaskButton("/icons/ButtonPicker.png");
 		datePickerButton.setOnAction(e -> {
 			datePicker.pickerDate = getPlanDate();
 			datePicker.Update();
@@ -132,28 +105,14 @@ public class CalendarPane extends VBox {
 		});
 		
 		//Previous date button
-		Button previousDateButton = new Button();
-		previousDateButton.setMinSize(34, 34);
-		previousDateButton.setMaxSize(34, 34);
-		Image previousImage = new Image(getClass().getResourceAsStream("/icons/ButtonPrevious.png"), 34, 34, true, true);
-		ImageView previousImageView = new ImageView(previousImage);
-		previousImageView.fitHeightProperty().bind(previousDateButton.heightProperty());
-		previousImageView.fitWidthProperty().bind(previousDateButton.widthProperty());
-		previousDateButton.setGraphic(previousImageView);
+		Button previousDateButton = new TaskButton("/icons/ButtonPrevious.png");
 		previousDateButton.setOnAction(e -> {
 			this.setViewMode(ViewMode.week);
 			this.setPlanDate(this.weekDates[0].minusDays(7));
 		});
 
 		//Next date button
-		Button nextDateButton = new Button();
-		nextDateButton.setMinSize(34, 34);
-		nextDateButton.setMaxSize(34, 34);
-		Image nextImage = new Image(getClass().getResourceAsStream("/icons/ButtonNext.png"), 34, 34, true, true);
-		ImageView nextImageView = new ImageView(nextImage);
-		nextImageView.fitHeightProperty().bind(nextDateButton.heightProperty());
-		nextImageView.fitWidthProperty().bind(nextDateButton.widthProperty());
-		nextDateButton.setGraphic(nextImageView);
+		Button nextDateButton = new TaskButton("/icons/ButtonNext.png");
 		nextDateButton.setOnAction(e -> {
 			this.setViewMode(ViewMode.week);
 			this.setPlanDate(this.weekDates[0].plusDays(7));
