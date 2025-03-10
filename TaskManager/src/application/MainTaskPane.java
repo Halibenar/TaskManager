@@ -7,9 +7,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.Node;
 
 /**
  * Extends TaskPane. Belongs to a MainTask. Displays MainTask name, time and completion and allows it to be edited and deleted.
@@ -37,26 +37,19 @@ public class MainTaskPane extends TaskPane {
 		this.getChildren().clear();
 		this.getChildren().addAll(this.buttonBox, this.mainTaskBox, this.subTaskBox);
 		this.subTaskBox.setPadding(new Insets(0,0,0,34));
-		
-		//Subtask expand labels for subtaskcount and expansion status on the expand button
-		Label expandLabel = new Label();
-		if (((MainTask)this.task).isExpanded()) {
-			expandLabel.setText("V");
-		} else {
-			expandLabel.setText("^");
-		}
-		HBox expandButtonBox = new HBox();
-		expandButtonBox.setAlignment(Pos.CENTER_LEFT);
-		expandButtonBox.getChildren().addAll(this.subTaskCountLabel, expandLabel);
 
 		//Subtask expand button, only visible if subtasks are added in addSubTaskPanes
-		this.expandButton = new TaskButton(((Node)expandButtonBox));
+		this.expandButton = new TaskButton("/icons/ButtonRetracted.png");
 		this.expandButton.setOnAction(e -> {
 			if (((MainTask)this.task).getSubTaskList().size() > 0) {
 				((MainTask)this.task).setExpanded(!((MainTask)this.task).isExpanded());
 			}
 		});
 		this.expandButton.setVisible(false);
+		
+		//Stack subtask expand button and count label
+		StackPane subTaskButtonStack = new StackPane();
+		subTaskButtonStack.getChildren().addAll(this.subTaskCountLabel, this.expandButton);
 		
 		//Time label
 		this.taskTimeLabel.setAlignment(Pos.CENTER_LEFT);
@@ -66,7 +59,7 @@ public class MainTaskPane extends TaskPane {
 
 		//Rebuild Hbox
 		this.taskBox.getChildren().clear();
-		this.taskBox.getChildren().addAll(expandButton, this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel);
+		this.taskBox.getChildren().addAll(subTaskButtonStack, this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel);
 
 		//Button to hold the HBox
 		this.taskBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
@@ -147,5 +140,11 @@ public class MainTaskPane extends TaskPane {
 	public void setExpanded(Boolean expanded) {
 		this.subTaskBox.setVisible(expanded);
 		this.subTaskBox.setManaged(expanded);
+		
+		if (expanded) {
+			this.expandButton.setImage("/icons/ButtonExpanded.png");
+		} else {
+			this.expandButton.setImage("/icons/ButtonRetracted.png");
+		}
 	}
 }
