@@ -257,6 +257,9 @@ public class MainTask extends Task implements Comparable<MainTask> {
 							}
 						}
 					}
+					
+					//Create TaskPane
+					newMainTask.taskPane = new MainTaskPane(newMainTask);
 
 					//Get subtasks for main task
 					SQLConnector.read("SELECT * FROM subtasks WHERE MainTaskID = " + newMainTask.getID(), rsSubTask -> {
@@ -271,8 +274,6 @@ public class MainTask extends Task implements Comparable<MainTask> {
 							System.out.println(e);
 						}
 					});
-					//Create TaskPane
-					newMainTask.taskPane = new MainTaskPane(newMainTask);
 					
 					//Add main task to tasklist
 					taskList.add(newMainTask);

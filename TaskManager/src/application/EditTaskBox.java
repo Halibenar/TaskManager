@@ -5,9 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -15,8 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -36,7 +32,7 @@ public class EditTaskBox extends VBox {
 	private HBox taskCategoryBox;
 	ComboBox<Category> categoryComboBox;
 	private VBox subTaskBox;
-
+	private TaskButton switchDateButton;
 	private Boolean taskHasDate;
 	
 	/**
@@ -186,10 +182,8 @@ public class EditTaskBox extends VBox {
 			this.delete();
 		});
 		
-		Button switchDateButton = new Button("S");
-		switchDateButton.setMinSize(34, 34);
-		switchDateButton.setMaxSize(34, 34);
-		switchDateButton.setOnAction(e -> {
+		this.switchDateButton = new TaskButton("/icons/ButtonSwitchToDo.png");
+		this.switchDateButton.setOnAction(e -> {
 			this.setTaskHasDate(!this.taskHasDate);
 		});
 		
@@ -318,6 +312,12 @@ public class EditTaskBox extends VBox {
 	
 	public void setTaskHasDate(Boolean hasDate) {
 		this.taskHasDate = hasDate;
+		
+		if (hasDate) {
+			this.switchDateButton.setImage("/icons/ButtonSwitchToDo.png");
+		} else {
+			this.switchDateButton.setImage("/icons/ButtonSwitchCalendar.png");
+		}
 				
 		this.taskDateBox.setVisible(hasDate);
 		this.taskDateBox.setManaged(hasDate);
