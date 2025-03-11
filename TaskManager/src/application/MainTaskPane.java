@@ -1,5 +1,6 @@
 package application;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javafx.geometry.Insets;
@@ -9,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 /**
@@ -19,7 +21,6 @@ public class MainTaskPane extends TaskPane {
 	
 	private HBox mainTaskBox = new HBox();
 	private VBox subTaskBox = new VBox();
-	private HBox buttonBox = new HBox();
 	private Label subTaskCountLabel = new Label();
 	private Label taskTimeLabel = new Label();
 	private TaskButton expandButton;
@@ -32,10 +33,22 @@ public class MainTaskPane extends TaskPane {
 	public MainTaskPane(MainTask task) {
 		super(task);
 		this.getStyleClass().add("hBoxTask");
+		
+		Label overdueLabel = new Label("Overdue:");
+		overdueLabel.setTextFill(Color.RED);
+		overdueLabel.setVisible(false);
+		overdueLabel.setManaged(false);
 		this.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+		if (((MainTask)this.task).getPlanDate() != null) {
+			if (((MainTask)this.task).getPlanDate().isBefore(LocalDate.now()) && !this.task.isCompleted()) {
+				this.setStyle("-fx-border-color: red; -fx-border-width: 1;");
+				overdueLabel.setVisible(true);
+				overdueLabel.setManaged(true);
+			}
+		}
 		this.setPadding(new Insets(0,0,0,0));
 		this.getChildren().clear();
-		this.getChildren().addAll(this.buttonBox, this.mainTaskBox, this.subTaskBox);
+		this.getChildren().addAll(this.mainTaskBox, this.subTaskBox);
 		this.subTaskBox.setPadding(new Insets(0,0,0,34));
 
 		//Subtask expand button, only visible if subtasks are added in addSubTaskPanes
@@ -59,7 +72,7 @@ public class MainTaskPane extends TaskPane {
 
 		//Rebuild Hbox
 		this.taskBox.getChildren().clear();
-		this.taskBox.getChildren().addAll(subTaskButtonStack, this.completeCheckBox, this.taskTimeLabel, this.taskNameLabel);
+		this.taskBox.getChildren().addAll(subTaskButtonStack, this.completeCheckBox, overdueLabel, this.taskTimeLabel, this.taskNameLabel);
 
 		//Button to hold the HBox
 		this.taskBox.setStyle("-fx-border-color: grey; -fx-border-width: 0 1 0 0;");
@@ -80,7 +93,7 @@ public class MainTaskPane extends TaskPane {
 			}
 		});
 
-		this.mainTaskBox.getChildren().addAll(taskBox, this.editButton);
+		this.mainTaskBox.getChildren().addAll(this.taskBox, this.editButton);
 		
 		//Set time, completed, expanded, editmode
 		this.setTime(((MainTask)this.task).getTime());

@@ -47,7 +47,6 @@ public class TaskPane extends VBox {
 		//Complete checkbox
 		this.completeCheckBox.setOnAction(e -> {
 			task.setCompleted(!task.isCompleted());
-			e.consume();
 		});
 		
 		this.taskBox.getChildren().addAll(this.completeCheckBox, this.taskNameLabel);

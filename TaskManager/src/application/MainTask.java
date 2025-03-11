@@ -181,14 +181,25 @@ public class MainTask extends Task implements Comparable<MainTask> {
 	public int compareTo(MainTask another) {
 		int outcome = 0;
 
-		//Sort based on task completion first
-		if (this.isCompleted() && !another.isCompleted()) {
-			outcome = 1;
-		} else if (!this.isCompleted() && another.isCompleted()) {
-			outcome = -1;
+		//Sort based on date
+		if (this.getPlanDate() != null && another.getPlanDate() != null) {
+			if (this.getPlanDate().isAfter(another.getPlanDate())) {
+				outcome = -1;
+			} else if (this.getPlanDate().isBefore(another.getPlanDate())) {
+				outcome = -1;
+			}
 		}
 
-		//Sort based on time second
+		//Sort based on task completion
+		if (outcome == 0) {
+			if (this.isCompleted() && !another.isCompleted()) {
+				outcome = 1;
+			} else if (!this.isCompleted() && another.isCompleted()) {
+				outcome = -1;
+			}
+		}
+
+		//Sort based on time
 		if (outcome == 0) {
 			if (this.time == null && another.time != null)
 			{
@@ -200,7 +211,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 			}
 		}
 
-		//Sort based on name last
+		//Sort based on name
 		if (outcome == 0) {
 			outcome = this.name.compareTo(another.name);
 		}
@@ -219,7 +230,7 @@ public class MainTask extends Task implements Comparable<MainTask> {
 		} else if (readMode == ReadMode.equals) {
 			SQLString += "= '" + date.toString() + "'";
 		} else if (readMode == ReadMode.lessThan) {
-			SQLString += "< '" + date.toString() + "'";
+			SQLString += "< '" + date.toString() + "' AND Completed = 'false'";
 		}
 		
 		if (category != null) {
@@ -235,9 +246,15 @@ public class MainTask extends Task implements Comparable<MainTask> {
 					if (rs.getString("Time") != null) {
 						taskTime = LocalTime.parse(rs.getString("Time"));
 					}
+					
+					//Parse date result from date query to LocalDate if it's not null
+					LocalDate taskDate  = null;
+					if (rs.getString("Date") != null) {
+						taskDate = LocalDate.parse(rs.getString("Date"));
+					}
 
 					//Create new main task
-					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), date, taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")));
+					MainTask newMainTask = new MainTask(rs.getInt("ID"), rs.getString("Name"), taskDate, taskTime, Boolean.parseBoolean(rs.getString("Completed")), Boolean.parseBoolean(rs.getString("Expanded")));
 
 					//Get category for main task; default is zero ("To Do"), but replaced if database contains a category matching tasks category
 					AtomicInteger categoryID = new AtomicInteger(0);
