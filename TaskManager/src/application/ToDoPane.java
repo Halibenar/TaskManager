@@ -2,7 +2,6 @@ package application;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -12,8 +11,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -48,15 +45,7 @@ public class ToDoPane extends VBox {
 		});
 		
 		//Add category button
-		Button addCategoryButton = new Button("A");
-		addCategoryButton.setMinSize(34, 34);
-		addCategoryButton.setMaxSize(34, 34);
-		addCategoryButton.setStyle("-fx-border-color: grey; -fx-border-width: 0;");
-//		Image addImage = new Image(getClass().getResourceAsStream("/icons/ButtonNew.png"), 34, 34, true, true);
-//		ImageView addImageView = new ImageView(addImage);
-//		addImageView.fitHeightProperty().bind(addCategoryButton.heightProperty());
-//		addImageView.fitWidthProperty().bind(addCategoryButton.widthProperty());
-//		addCategoryButton.setGraphic(addImageView);
+		Button addCategoryButton = new TaskButton("/icons/ButtonNewList.png");
 		addCategoryButton.setOnAction(e -> {
 			this.setAddMode(!this.getAddMode());
 		});
