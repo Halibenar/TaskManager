@@ -99,11 +99,11 @@ public class EditTaskBox extends VBox {
 			
 			//Copy changes to original task
 			this.task = new MainTask(copyTask);
+			this.task.updateSQL();
 			for (SubTask subTask : this.task.getSubTaskList()) {
 				subTask.updateSQL();
 			}
-			this.task.updateSQL();
-
+			
 			this.setVisible(false);
 			this.setManaged(false);
 		});
@@ -275,12 +275,12 @@ public class EditTaskBox extends VBox {
 			this.setTaskHasDate(false);
 		}
 		
-		AtomicInteger categoryID = new AtomicInteger(0);
-		if (this.copyTask.getCategory() != null ) {
-			categoryID.set(this.copyTask.getCategory().getID());
+		if (this.copyTask.getCategory() != null && this.copyTask.getCategory().getID() > 0) {
+			this.categoryComboBox.getSelectionModel().select(Category.getCategoryList().stream().filter(category -> category.getID() == this.copyTask.getCategory().getID()).findFirst().orElse(null));
+		} else {
+			this.categoryComboBox.getSelectionModel().select(Category.getCategoryList().stream().filter(category -> category.getID() == 0).findFirst().orElse(null));
 		}
-		Category.getCategoryList().stream().filter(c -> c.getID() == categoryID.get()).forEach(Category -> { this.categoryComboBox.setValue(Category); });
-
+		
 		for (SubTask subTask : this.copyTask.getSubTaskList()) {
 			this.subTaskBox.getChildren().add(new EditSubTaskBox(subTask));
 		}
@@ -327,13 +327,7 @@ public class EditTaskBox extends VBox {
 	}
 	
 	public void setPickList() {
-		ArrayList<Category> pickList = new ArrayList<Category>();
-		for (Category category : Category.getCategoryList()) {
-			if (category.getID() >= 0) {
-				pickList.add(category);
-			}
-		}
-		this.categoryComboBox.setItems(FXCollections.observableList(pickList));
+		this.categoryComboBox.setItems(FXCollections.observableList(Category.getCategoryList()));
 	}
 	
 	/**

@@ -60,9 +60,7 @@ public class ToDoPane extends VBox {
 		
 		//Category selection box
 		ObservableList<Category> categoryList = FXCollections.observableList(Category.getCategoryList());
-		this.category = new Category (-1, "All");
-		categoryList.add(this.category);
-		categoryList.sort(null);
+		this.category = categoryList.stream().filter(category -> category.getID() == -1).findFirst().orElse(null);
 		ComboBox<Category> categoryBox = new ComboBox<>();
 		categoryBox.setMinWidth(150);
 		categoryBox.setMaxWidth(150);
@@ -134,14 +132,15 @@ public class ToDoPane extends VBox {
 		//Confirm add category button
 		Button confirmCategoryButton = new TaskButton("/icons/ButtonConfirm.png");
 		confirmCategoryButton.setOnAction(e -> {
-			this.category = new Category (addCategoryField.getText());
+			this.category = new Category(addCategoryField.getText());
+			Category newCategory = this.category;
 			this.category.updateSQL();
 			categoryList.add(this.category);
 			categoryList.sort(null);
 			this.editTaskBox.setPickList();
-			categoryBox.setItems(categoryList);
 			addCategoryField.setText("");
 			this.setAddMode(false);
+			categoryBox.getSelectionModel().select(newCategory);
 		});
 		
 		this.addBox.getChildren().addAll(addCategoryTitleLabel, addCategoryField, confirmCategoryButton);
