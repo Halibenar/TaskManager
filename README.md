@@ -7,4 +7,7 @@ To try it out, download the runnable .jar file from the repository.
 Keep in mind that running it will require Java version 1.8 or later to be installed on your computer.  
 The application will create a local database for your personal tasks!
 
-# UI guide
+# User guide
+![userguide]
+
+[userguide]: https://github.com/Halibenar/TaskManager/blob/main/GuideImages/TaskManagerGuide.png ""
