@@ -68,6 +68,10 @@ public class SubTask extends Task implements Comparable<SubTask> {
 			String updateString = "UPDATE subtasks SET Name = ?, MainTaskID = ?, Completed = ? WHERE ID = " + this.getID();
 			SQLConnector.update(updateString, data);
 		}
+		
+		//Update UI
+		Main.toDoPane.getTasks(Main.toDoPane.getCategory());
+		Main.calendarPane.setPlanDate(Main.calendarPane.getPlanDate());
 	}
 
 	/**

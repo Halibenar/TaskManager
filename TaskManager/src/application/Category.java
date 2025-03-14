@@ -93,6 +93,7 @@ public class Category implements Comparable<Category> {
 		});
 		
 		//Add category for all
+		categoryList.add(new Category(-1, "All"));
 		categoryList.add(new Category(0, "Uncategorised"));
 		
 		//Sort list

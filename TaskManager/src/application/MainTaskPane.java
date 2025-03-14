@@ -145,8 +145,10 @@ public class MainTaskPane extends TaskPane {
 		this.subTaskCountLabel.setText(Integer.toString(((MainTask)this.task).getSubTaskList().size()));
 		if (((MainTask)this.task).getSubTaskList().size() == 0) {
 			this.expandButton.setVisible(false);
+			this.subTaskCountLabel.setVisible(false);
 		} else {
 			this.expandButton.setVisible(true);
+			this.subTaskCountLabel.setVisible(true);
 		}
 	}
 	
